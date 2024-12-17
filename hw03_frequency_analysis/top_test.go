@@ -48,6 +48,17 @@ func TestTop10(t *testing.T) {
 		require.Len(t, Top10(""), 0)
 	})
 
+	t.Run("emoji string", func(t *testing.T) {
+		expected := []string{
+			"❄️",       // 3
+			"зима❄️",   // 1
+			"снег",     // 1
+			"снежинки", // 1
+			"холодно",  // 1
+		}
+		require.Equal(t, expected, Top10("снег ❄️ холодно ❄️ зима❄️ снежинки ❄️"))
+	})
+
 	t.Run("positive test", func(t *testing.T) {
 		if taskWithAsteriskIsCompleted {
 			expected := []string{
