@@ -1,6 +1,7 @@
 package hw03frequencyanalysis
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -12,11 +13,13 @@ type WordFrequency struct {
 	count int
 }
 
+var pattern = regexp.MustCompile(`[\p{L}][\p{L}0-9-]*|-{2,}`)
+
 func Top10(s string) []string {
-	words := strings.Fields(s)
+	words := pattern.FindAllString(s, -1)
 	frequency := make(map[string]int)
 	for _, v := range words {
-		frequency[v]++
+		frequency[strings.ToLower(v)]++
 	}
 
 	pairs := make([]WordFrequency, 0, len(frequency))
