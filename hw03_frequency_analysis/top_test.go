@@ -7,7 +7,7 @@ import (
 )
 
 // Change to true if needed.
-var taskWithAsteriskIsCompleted = false
+var taskWithAsteriskIsCompleted = true
 
 var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
@@ -48,15 +48,21 @@ func TestTop10(t *testing.T) {
 		require.Len(t, Top10(""), 0)
 	})
 
-	t.Run("emoji string", func(t *testing.T) {
+	t.Run("dash test", func(t *testing.T) {
 		expected := []string{
-			"❄️",       // 3
-			"зима❄️",   // 1
-			"снег",     // 1
-			"снежинки", // 1
-			"холодно",  // 1
+			"---",           // 2
+			"алтайского",    // 2
+			"границе",       // 2
+			"и",             // 2
+			"на",            // 2
+			"области",       // 2
+			"вкуснее",       // 1
+			"город",         // 1
+			"камень",        // 1
+			"камень-на-оби", // 1
 		}
-		require.Equal(t, expected, Top10("снег ❄️ холодно ❄️ зима❄️ снежинки ❄️"))
+		require.Equal(t, expected, Top10(`Город Камень-на-оби находится на границе Новосибирской области и Алтайского края.
+		--- Камень на границе области - и нет вкуснее мёда алтайского! ---`))
 	})
 
 	t.Run("positive test", func(t *testing.T) {
