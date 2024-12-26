@@ -23,7 +23,7 @@ type list struct {
 }
 
 func NewList() List {
-	return &list{}
+	return new(list)
 }
 
 func (l *list) Len() int {
