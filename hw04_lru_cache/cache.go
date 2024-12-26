@@ -27,11 +27,10 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 	if exists {
 		item.Value = value
 		return true
-	} else {
-		newL := l.queue.PushBack(value)
-		l.items[key] = newL
-		return false
 	}
+	newL := l.queue.PushBack(value)
+	l.items[key] = newL
+	return false
 }
 
 func (l *lruCache) Get(key Key) (interface{}, bool) {
