@@ -26,9 +26,20 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 	item, exists := l.items[key]
 	if exists {
 		item.Value = value
+		l.queue.MoveToFront(item)
 		return true
 	}
-	newL := l.queue.PushBack(value)
+	newL := l.queue.PushFront(value)
+	if l.queue.Len() > l.capacity {
+		lastElem := l.queue.Back()
+		for keyInMap, valInMap := range l.items {
+			if valInMap.Value == lastElem.Value {
+				delete(l.items, keyInMap)
+				break
+			}
+		}
+		l.queue.Remove(lastElem)
+	}
 	l.items[key] = newL
 	return false
 }
@@ -38,6 +49,7 @@ func (l *lruCache) Get(key Key) (interface{}, bool) {
 	if !exists {
 		return nil, false
 	}
+	l.queue.MoveToFront(item)
 	return item.Value, true
 }
 
