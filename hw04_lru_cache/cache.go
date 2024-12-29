@@ -62,12 +62,5 @@ func (l *lruCache) Get(key Key) (interface{}, bool) {
 
 func (l *lruCache) Clear() {
 	l.items = make(map[Key]*ListItem) // clear(l.items) Go ver 1.21+
-	if l.queue.Len() > 0 {
-		item := l.queue.Front()
-		for item != nil {
-			next := item.Next
-			l.queue.Remove(item)
-			item = next
-		}
-	}
+	l.queue = NewList()
 }
