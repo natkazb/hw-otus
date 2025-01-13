@@ -2,6 +2,7 @@ package hw05parallelexecution
 
 import (
 	"errors"
+	"sync"
 )
 
 var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
@@ -9,52 +10,64 @@ var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
 type Task func() error
 
 // Run starts tasks in n goroutines and stops its work when receiving m errors from tasks.
-func Run(tasks []Task, n, m int) error {
-	countOfTasks := 0
-	countOfErrors := 0
-
-	chEndTask := make(chan struct{}, n)
-	chAddError := make(chan struct{}, n)
-
-	lenTasks := len(tasks)
-	finish := lenTasks
-	if n < finish {
-		finish = n
+func Run(tasks []Task, n int, m int) error {
+	if len(tasks) == 0 {
+		return nil
 	}
 
-	i := 0
-	for ; i < finish; i++ {
-		countOfTasks++
-		go func(task Task) {
-			defer func() { chEndTask <- struct{}{} }()
-			if err := task(); err != nil {
-				chAddError <- struct{}{}
-			}
-		}(tasks[i])
+	taskCh := make(chan Task)
+	errCh := make(chan error)
+	doneCh := make(chan struct{})
+	wg := sync.WaitGroup{}
+
+	// Запуск n воркеров
+	for i := 0; i < n; i++ {
+		go worker(taskCh, errCh, doneCh, &wg)
 	}
 
-	for {
+	// Счетчик ошибок
+	errCount := 0
+	tasksLeft := len(tasks)
+
+	// Отправка первой партии задач
+	go func() {
+		for _, t := range tasks {
+			taskCh <- t
+		}
+		close(taskCh)
+	}()
+
+	// Обработка результатов
+	for tasksLeft > 0 {
 		select {
-		case <-chAddError:
-			countOfErrors++
-			if countOfErrors >= m {
-				return ErrErrorsLimitExceeded
+		case err := <-errCh:
+			if err != nil {
+				errCount++
+				if errCount >= m {
+					wg.Wait()
+					return ErrErrorsLimitExceeded
+				}
 			}
-		case <-chEndTask:
-			countOfTasks--
-			if i >= lenTasks {
-				return nil
-			}
-			if countOfTasks < n {
-				countOfTasks++
-				go func() {
-					defer func() { i++; chEndTask <- struct{}{} }()
-					if err := tasks[i](); err != nil {
-						chAddError <- struct{}{}
-					}
-				}()
-			}
+			tasksLeft--
+		case <-doneCh:
+			tasksLeft--
 		}
 	}
-	// return nil
+
+	wg.Wait()
+	return nil
+}
+
+func worker(taskCh <-chan Task, errCh chan<- error, doneCh chan<- struct{}, w *sync.WaitGroup) {
+	for task := range taskCh {
+		w.Add(1)
+		err := task()
+		if err != nil {
+			w.Done()
+			errCh <- err
+		} else {
+			w.Done()
+			doneCh <- struct{}{}
+		}
+	}
 }
