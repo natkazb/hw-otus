@@ -18,25 +18,24 @@ func Run(tasks []Task, n int, m int) error {
 	taskCh := make(chan Task)
 	doneCh := make(chan error, n)
 	wg := sync.WaitGroup{}
-	defer func() {
-		wg.Wait()
+	defer func(w *sync.WaitGroup) {
+		w.Wait()
 		close(doneCh)
 		close(taskCh)
-	}()
+	}(&wg)
 
-	// Запуск n воркеров
 	for i := 0; i < n; i++ {
 		go worker(taskCh, doneCh, &wg)
 	}
 
-	// Счетчик ошибок
 	errCount := 0
+	tasksLeft := len(tasks)
 
 	idxTask := 0
-	for idxTask < len(tasks) {
+	for tasksLeft > 0 {
 		select {
 		case err := <-doneCh:
-			idxTask++
+			tasksLeft--
 			if err != nil {
 				errCount++
 				if errCount >= m {
@@ -44,7 +43,10 @@ func Run(tasks []Task, n int, m int) error {
 				}
 			}
 		default:
-			taskCh <- tasks[idxTask]
+			if idxTask < len(tasks) {
+				taskCh <- tasks[idxTask]
+				idxTask++
+			}
 		}
 	}
 
