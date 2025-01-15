@@ -16,58 +16,50 @@ func Run(tasks []Task, n int, m int) error {
 	}
 
 	taskCh := make(chan Task)
-	errCh := make(chan error)
-	doneCh := make(chan struct{})
+	doneCh := make(chan error, n)
 	wg := sync.WaitGroup{}
 
 	// Запуск n воркеров
 	for i := 0; i < n; i++ {
-		go worker(taskCh, errCh, doneCh, &wg)
+		go worker(taskCh, doneCh, &wg)
 	}
 
 	// Счетчик ошибок
 	errCount := 0
 	tasksLeft := len(tasks)
 
-	// Отправка первой партии задач
-	go func() {
-		for _, t := range tasks {
-			taskCh <- t
-		}
-		close(taskCh)
-	}()
-
-	// Обработка результатов
+	idxTask := 0
 	for tasksLeft > 0 {
 		select {
-		case err := <-errCh:
+		case err := <-doneCh:
+			tasksLeft--
 			if err != nil {
 				errCount++
 				if errCount >= m {
 					wg.Wait()
+					close(doneCh)
+					close(taskCh)
 					return ErrErrorsLimitExceeded
 				}
 			}
-			tasksLeft--
-		case <-doneCh:
-			tasksLeft--
+		default:
+			if idxTask < len(tasks) {
+				taskCh <- tasks[idxTask]
+				idxTask++
+			}
 		}
 	}
 
 	wg.Wait()
+	close(doneCh)
+	close(taskCh)
 	return nil
 }
 
-func worker(taskCh <-chan Task, errCh chan<- error, doneCh chan<- struct{}, w *sync.WaitGroup) {
+func worker(taskCh chan Task, doneCh chan error, w *sync.WaitGroup) {
 	for task := range taskCh {
 		w.Add(1)
-		err := task()
-		if err != nil {
-			w.Done()
-			errCh <- err
-		} else {
-			w.Done()
-			doneCh <- struct{}{}
-		}
+		doneCh <- task()
+		w.Done()
 	}
 }
