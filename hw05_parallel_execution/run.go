@@ -21,36 +21,39 @@ func Run(tasks []Task, n int, m int) error {
 
 	taskCh := make(chan Task)
 	doneCh := make(chan error, n)
+	stopTaskCh := make(chan struct{})
 	wg := sync.WaitGroup{}
 	defer func(w *sync.WaitGroup) {
 		w.Wait()
+		close(stopTaskCh)
 		close(doneCh)
-		close(taskCh)
 	}(&wg)
 
 	for i := 0; i < n; i++ {
 		go worker(taskCh, doneCh, &wg)
 	}
 
-	errCount := 0
-	tasksLeft := len(tasks)
-	idxTask := 0
-	for tasksLeft > 0 {
-		select {
-		case err := <-doneCh:
-			tasksLeft--
-			if m > 0 {
-				if err != nil {
-					errCount++
-					if errCount >= m {
-						return ErrErrorsLimitExceeded
-					}
-				}
+	go func(taskCh1 chan Task, stopTaskCh1 chan struct{}) {
+		defer close(taskCh1)
+		for _, task := range tasks {
+			select {
+			case <-stopTaskCh1:
+				return
+			default:
+				taskCh1 <- task
 			}
-		default:
-			if idxTask < len(tasks) {
-				taskCh <- tasks[idxTask]
-				idxTask++
+		}
+	}(taskCh, stopTaskCh)
+
+	errCount := 0
+	for err := range doneCh {
+		if m > 0 {
+			if err != nil {
+				errCount++
+				if errCount >= m {
+					stopTaskCh <- struct{}{}
+					return ErrErrorsLimitExceeded
+				}
 			}
 		}
 	}
