@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io"
 	"os"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 var (
@@ -51,15 +53,21 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 
 	// Определяем, сколько байт копировать
 	var reader io.Reader = src
+	var bytesToCopy int64
 	if limit > 0 {
-		bytesToCopy := limit
+		bytesToCopy = limit
 		if offset+limit > fileSize {
 			bytesToCopy = fileSize - offset
 		}
 		reader = io.LimitReader(src, bytesToCopy)
 	}
 
+	// progress bar
+	bar := pb.Default.Start64(bytesToCopy)
+	barReader := bar.NewProxyReader(reader)
+	defer bar.Finish()
+
 	// Копируем данные
-	_, err = io.Copy(dst, reader)
+	_, err = io.Copy(dst, barReader)
 	return err
 }
