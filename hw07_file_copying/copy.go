@@ -52,18 +52,17 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 
 	// Определяем, сколько байт копировать
-	var reader io.Reader = src
-	var bytesToCopy int64
+	bytesToCopy := fileSize
 	if limit > 0 {
 		bytesToCopy = limit
 		if offset+limit > fileSize {
 			bytesToCopy = fileSize - offset
 		}
-		reader = io.LimitReader(src, bytesToCopy)
 	}
+	reader := io.LimitReader(src, bytesToCopy)
 
 	// progress bar
-	bar := pb.Default.Start64(bytesToCopy)
+	bar := pb.Full.Start64(bytesToCopy)
 	barReader := bar.NewProxyReader(reader)
 	defer bar.Finish()
 
