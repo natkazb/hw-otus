@@ -3,6 +3,7 @@ package hw05parallelexecution
 import (
 	"errors"
 	"sync"
+	"sync/atomic"
 )
 
 var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
@@ -20,51 +21,43 @@ func Run(tasks []Task, n int, m int) error {
 	}
 
 	taskCh := make(chan Task)
-	doneCh := make(chan error, n)
-	stopTaskCh := make(chan struct{})
 	wg := sync.WaitGroup{}
-	defer func(w *sync.WaitGroup) {
-		w.Wait()
-		close(stopTaskCh)
-		close(doneCh)
-	}(&wg)
 
+	var errCount int64
 	for i := 0; i < n; i++ {
-		go worker(taskCh, doneCh, &wg)
+		go worker(taskCh, &wg, m, &errCount)
 	}
 
-	go func(taskCh1 chan Task, stopTaskCh1 chan struct{}) {
-		defer close(taskCh1)
-		for _, task := range tasks {
-			select {
-			case <-stopTaskCh1:
-				return
-			default:
-				taskCh1 <- task
+	for _, t := range tasks {
+		if m > 0 {
+			if atomic.LoadInt64(&errCount) >= int64(m) {
+				break
 			}
 		}
-	}(taskCh, stopTaskCh)
+		taskCh <- t
+	}
+	close(taskCh)
 
-	errCount := 0
-	for err := range doneCh {
-		if m > 0 {
-			if err != nil {
-				errCount++
-				if errCount >= m {
-					stopTaskCh <- struct{}{}
-					return ErrErrorsLimitExceeded
-				}
-			}
+	wg.Wait()
+
+	if m > 0 {
+		if atomic.LoadInt64(&errCount) >= int64(m) {
+			return ErrErrorsLimitExceeded
 		}
 	}
 
 	return nil
 }
 
-func worker(taskCh chan Task, doneCh chan error, w *sync.WaitGroup) {
+func worker(taskCh chan Task, w *sync.WaitGroup, m int, errCount *int64) {
+	w.Add(1)
 	for task := range taskCh {
-		w.Add(1)
-		doneCh <- task()
-		w.Done()
+		err := task()
+		if m > 0 {
+			if err != nil {
+				atomic.AddInt64(errCount, 1)
+			}
+		}
 	}
+	w.Done()
 }
