@@ -25,38 +25,22 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 		intermediate := make(Bi)
 
 		// Запускаем горутину для обработки текущего stage
-		go func(in In, stage Stage, out Bi) {
+		go func(in In, out Bi) {
 			defer close(out)
 
 			for v := range in {
-				// fmt.Printf("stage %d in: %v \n", i, v)
-				// Проверяем сигнал done
 				select {
 				case <-done:
-					// fmt.Printf("stage %d done1 \n", i)
+					for i := range in {
+						_ = i
+					}
 					return
-				default:
-				}
-
-				// Создаем временный канал для передачи значения в stage
-				tmpCh := make(Bi, 1)
-				tmpCh <- v
-				close(tmpCh)
-				// Получаем результат этапа
-				result := stage(tmpCh)
-
-				// Пытаемся отправить результат
-				select {
-				case <-done:
-					// fmt.Printf("stage %d done2 \n", i)
-					return
-				case out <- <-result:
-					// fmt.Printf("stage %d out: (%v) \n", i, v)
+				case out <- v:
 				}
 			}
-		}(current, stage, intermediate)
+		}(current, intermediate)
 
-		current = intermediate
+		current = stage(intermediate)
 	}
 
 	return current
