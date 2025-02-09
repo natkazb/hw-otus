@@ -12,8 +12,9 @@ func TestReadDir(t *testing.T) {
 		require.NoError(t, err, "actual error %q", err)
 
 		expected := Environment{
-			"ONE": EnvValue{Value: "One"},
-			"TWO": EnvValue{Value: "Two"},
+			"ONE":   EnvValue{Value: "One"},
+			"TWO":   EnvValue{Value: "Two"},
+			"EMPTY": EnvValue{NeedRemove: true},
 		}
 
 		require.Equal(t, env, expected, "actual: %v expected: %v", env, expected)

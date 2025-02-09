@@ -30,9 +30,7 @@ func RunCmd(cmd []string, env Environment) (returnCode int) {
 	command.Stderr = os.Stderr
 
 	command.Start()
-
 	command.Wait()
-
 	return command.ProcessState.ExitCode()
 }
 
