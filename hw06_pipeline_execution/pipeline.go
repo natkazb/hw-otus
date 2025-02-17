@@ -26,16 +26,26 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 
 		// Запускаем горутину для обработки текущего stage
 		go func(in In, out Bi) {
-			defer close(out)
+			defer func() {
+				close(out)
+				for i := range in {
+					_ = i
+				}
+			}()
 
-			for v := range in {
+			for {
 				select {
 				case <-done:
-					for i := range in {
-						_ = i
-					}
 					return
-				case out <- v:
+				case v, ok := <-in:
+					if !ok {
+						return
+					}
+					select {
+					case <-done:
+						return
+					case out <- v:
+					}
 				}
 			}
 		}(current, intermediate)
