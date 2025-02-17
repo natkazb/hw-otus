@@ -16,6 +16,16 @@ type ValidationError struct {
 
 type ValidationErrors []ValidationError
 
+var ErrNotStruct = errors.New("input must be a struct")
+var ErrInvalidValidator = errors.New("invalid validator format")
+var ErrUnknownValidator = errors.New("unknown validator")
+var ErrINTMinInvalid = errors.New("invalid min value")
+var ErrINTMinLess = errors.New("value is less than min")
+var ErrINTMaxInvalid = errors.New("invalid max value")
+var ErrINTMaxGreater = errors.New("value is greater than min")
+var ErrINInvalid = errors.New("invalid in value")
+var ErrINNotInSet = errors.New("value is not in allowed set")
+
 func (v ValidationErrors) Error() string {
 	var errStrings []string
 	for _, err := range v {
@@ -29,7 +39,7 @@ func Validate(v interface{}) error {
 	typeV := valueV.Type()
 
 	if typeV.Kind() != reflect.Struct {
-		return errors.New("input must be a struct")
+		return ErrNotStruct
 	}
 
 	var validationErrors ValidationErrors
@@ -37,7 +47,7 @@ func Validate(v interface{}) error {
 	for i := 0; i < typeV.NumField(); i++ {
 		field := typeV.Field(i)
 		validateTag, ok := field.Tag.Lookup("validate")
-		if !ok { // нет тега, пропустим это поле
+		if !ok { // нет тега, пропускаем
 			continue
 		}
 		if errs := validateField(field.Name, valueV.Field(i), validateTag); errs != nil {
@@ -86,25 +96,25 @@ func validateField(fieldName string, value reflect.Value, rules string) Validati
 func validateInt(value int64, validator string) error {
 	parts := strings.Split(validator, ":")
 	if len(parts) != 2 {
-		return fmt.Errorf("invalid validator format: %s", validator)
+		return fmt.Errorf("%w: %s", ErrInvalidValidator, validator)
 	}
 
 	switch parts[0] {
 	case "min":
 		min, err := strconv.ParseInt(parts[1], 10, 64)
 		if err != nil {
-			return fmt.Errorf("invalid min value: %s", parts[1])
+			return fmt.Errorf("%w: %s", ErrINTMinInvalid, parts[1])
 		}
 		if value < min {
-			return fmt.Errorf("value %d is less than min %d", value, min)
+			return fmt.Errorf("%w: %d is less than min %d", ErrINTMinLess, value, min)
 		}
 	case "max":
 		max, err := strconv.ParseInt(parts[1], 10, 64)
 		if err != nil {
-			return fmt.Errorf("invalid max value: %s", parts[1])
+			return fmt.Errorf("%w: %s", ErrINTMaxInvalid, parts[1])
 		}
 		if value > max {
-			return fmt.Errorf("value %d is greater than max %d", value, max)
+			return fmt.Errorf("%w: %d is greater than max %d", ErrINTMaxGreater, value, max)
 		}
 	case "in":
 		values := strings.Split(parts[1], ",")
@@ -112,7 +122,7 @@ func validateInt(value int64, validator string) error {
 		for _, v := range values {
 			num, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				return fmt.Errorf("invalid in value: %s", v)
+				return fmt.Errorf("%w: %s", ErrINInvalid, v)
 			}
 			if value == num {
 				valid = true
@@ -120,10 +130,10 @@ func validateInt(value int64, validator string) error {
 			}
 		}
 		if !valid {
-			return fmt.Errorf("value %d is not in allowed set %s", value, parts[1])
+			return fmt.Errorf("%w: %d is not in allowed set %s", ErrINTMaxGreater, value, parts[1])
 		}
 	default:
-		return fmt.Errorf("unknown validator: %s", parts[0])
+		return fmt.Errorf("%w: %s", ErrUnknownValidator, parts[0])
 	}
 	return nil
 }
@@ -131,7 +141,7 @@ func validateInt(value int64, validator string) error {
 func validateString(value string, validator string) error {
 	parts := strings.Split(validator, ":")
 	if len(parts) != 2 {
-		return fmt.Errorf("invalid validator format: %s", validator)
+		return fmt.Errorf("%w: %s", ErrInvalidValidator, validator)
 	}
 
 	switch parts[0] {
@@ -164,7 +174,7 @@ func validateString(value string, validator string) error {
 			return fmt.Errorf("value %s is not in allowed set %s", value, parts[1])
 		}
 	default:
-		return fmt.Errorf("unknown validator: %s", parts[0])
+		return fmt.Errorf("%w: %s", ErrUnknownValidator, parts[0])
 	}
 	return nil
 }
