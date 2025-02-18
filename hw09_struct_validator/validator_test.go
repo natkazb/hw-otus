@@ -126,7 +126,9 @@ func TestValidateErrors(t *testing.T) {
 				{Field: "Age", Err: errors.New("value is less than min: 15 is less than min 18")},
 				{Field: "Email", Err: errors.New("string does not match pattern: ^\\w+@\\w+\\.\\w+$")},
 				{Field: "Role", Err: errors.New("value is not in allowed set: unknown is not in set admin,stuff")},
+				//nolint:lll
 				{Field: "Phones[0]", Err: errors.New("string length does not match required length: length 3 does not match length 11")},
+				//nolint:lll
 				{Field: "Phones[1]", Err: errors.New("string length does not match required length: length 3 does not match length 11")},
 			},
 		},
