@@ -16,20 +16,27 @@ type ValidationError struct {
 
 type ValidationErrors []ValidationError
 
-var ErrNotStruct = errors.New("input must be a struct")
-var ErrInvalidValidator = errors.New("invalid validator format")
-var ErrUnknownValidator = errors.New("unknown validator")
-var ErrINTMinInvalid = errors.New("invalid min value")
-var ErrINTMinLess = errors.New("value is less than min")
-var ErrINTMaxInvalid = errors.New("invalid max value")
-var ErrINTMaxGreater = errors.New("value is greater than min")
-var ErrINInvalid = errors.New("invalid in value")
-var ErrINNotInSet = errors.New("value is not in allowed set")
+var (
+	ErrNotStruct            = errors.New("input must be a struct")
+	ErrInvalidValidator     = errors.New("invalid validator format")
+	ErrUnknownValidator     = errors.New("unknown validator")
+	ErrINTMinInvalid        = errors.New("invalid min value")
+	ErrINTMinLess           = errors.New("value is less than min")
+	ErrINTMaxInvalid        = errors.New("invalid max value")
+	ErrINTMaxGreater        = errors.New("value is greater than max")
+	ErrINInvalid            = errors.New("invalid in value")
+	ErrINNotInSet           = errors.New("value is not in allowed set")
+	ErrSTRINGLenInvalid     = errors.New("invalid length value")
+	ErrSTRINGLenNotMatch    = errors.New("string length does not match required length")
+	ErrSTRINGRegexpInvalid  = errors.New("invalid regexp pattern")
+	ErrSTRINGRegexpNotMatch = errors.New("string does not match pattern")
+	ErrSTRINGInNotInSet     = errors.New("value is not in allowed set")
+)
 
 func (v ValidationErrors) Error() string {
-	var errStrings []string
+	errStrings := make([]string, 0, len(v))
 	for _, err := range v {
-		errStrings = append(errStrings, fmt.Sprintf("%s: %v", err.Field, err.Err))
+		errStrings = append(errStrings, fmt.Sprintf("%s: %v", err.Field, err.Err)) // nozero
 	}
 	return strings.Join(errStrings, "; ")
 }
@@ -65,6 +72,7 @@ func validateField(fieldName string, value reflect.Value, rules string) Validati
 	validators := strings.Split(rules, "|")
 	var errors ValidationErrors
 
+	//nolint:exhaustive
 	switch value.Kind() {
 	case reflect.Int:
 		for _, validator := range validators {
@@ -85,6 +93,7 @@ func validateField(fieldName string, value reflect.Value, rules string) Validati
 				errors = append(errors, errs...)
 			}
 		}
+	default: // Skip validation for unsupported types
 	}
 
 	if len(errors) > 0 {
@@ -101,20 +110,20 @@ func validateInt(value int64, validator string) error {
 
 	switch parts[0] {
 	case "min":
-		min, err := strconv.ParseInt(parts[1], 10, 64)
+		minVal, err := strconv.ParseInt(parts[1], 10, 64)
 		if err != nil {
 			return fmt.Errorf("%w: %s", ErrINTMinInvalid, parts[1])
 		}
-		if value < min {
-			return fmt.Errorf("%w: %d is less than min %d", ErrINTMinLess, value, min)
+		if value < minVal {
+			return fmt.Errorf("%w: %d is less than min %d", ErrINTMinLess, value, minVal)
 		}
 	case "max":
-		max, err := strconv.ParseInt(parts[1], 10, 64)
+		maxVal, err := strconv.ParseInt(parts[1], 10, 64)
 		if err != nil {
 			return fmt.Errorf("%w: %s", ErrINTMaxInvalid, parts[1])
 		}
-		if value > max {
-			return fmt.Errorf("%w: %d is greater than max %d", ErrINTMaxGreater, value, max)
+		if value > maxVal {
+			return fmt.Errorf("%w: %d is greater than max %d", ErrINTMaxGreater, value, maxVal)
 		}
 	case "in":
 		values := strings.Split(parts[1], ",")
@@ -130,7 +139,7 @@ func validateInt(value int64, validator string) error {
 			}
 		}
 		if !valid {
-			return fmt.Errorf("%w: %d is not in allowed set %s", ErrINTMaxGreater, value, parts[1])
+			return fmt.Errorf("%w: %d is not in allowed set %s", ErrINNotInSet, value, parts[1])
 		}
 	default:
 		return fmt.Errorf("%w: %s", ErrUnknownValidator, parts[0])
@@ -148,18 +157,18 @@ func validateString(value string, validator string) error {
 	case "len":
 		length, err := strconv.Atoi(parts[1])
 		if err != nil {
-			return fmt.Errorf("invalid length value: %s", parts[1])
+			return fmt.Errorf("%w: %s", ErrSTRINGLenInvalid, parts[1])
 		}
 		if len(value) != length {
-			return fmt.Errorf("string length %d does not match required length %d", len(value), length)
+			return fmt.Errorf("%w: length %d does not match length %d", ErrSTRINGLenNotMatch, len(value), length)
 		}
 	case "regexp":
 		re, err := regexp.Compile(parts[1])
 		if err != nil {
-			return fmt.Errorf("invalid regexp pattern: %s", parts[1])
+			return fmt.Errorf("%w: %s", ErrSTRINGRegexpInvalid, parts[1])
 		}
 		if !re.MatchString(value) {
-			return fmt.Errorf("string does not match pattern %s", parts[1])
+			return fmt.Errorf("%w: %s", ErrSTRINGRegexpNotMatch, parts[1])
 		}
 	case "in":
 		values := strings.Split(parts[1], ",")
@@ -171,7 +180,7 @@ func validateString(value string, validator string) error {
 			}
 		}
 		if !valid {
-			return fmt.Errorf("value %s is not in allowed set %s", value, parts[1])
+			return fmt.Errorf("%w: %s is not in set %s", ErrSTRINGInNotInSet, value, parts[1])
 		}
 	default:
 		return fmt.Errorf("%w: %s", ErrUnknownValidator, parts[0])
