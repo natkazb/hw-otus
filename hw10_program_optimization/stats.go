@@ -2,7 +2,6 @@ package hw10programoptimization
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -34,7 +33,7 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 			break
 		}
 		if err != nil {
-			return nil, fmt.Errorf("get users error: %w", err)
+			return nil, err
 		}
 		if strings.HasSuffix(user.Email, domain) {
 			if at := strings.IndexByte(user.Email, '@'); at != -1 {
