@@ -1,0 +1,23 @@
+before
+go test -v -count=1 -timeout=30s -tags bench .
+=== RUN   TestGetDomainStat_Time_And_Memory
+    stats_optimization_test.go:46: time used: 641.716937ms / 300ms
+    stats_optimization_test.go:47: memory used: 308Mb / 30Mb
+    assertion_compare.go:332: 
+                Error Trace:    stats_optimization_test.go:49
+                Error:          "641716937" is not less than "300000000"
+                Test:           TestGetDomainStat_Time_And_Memory
+                Messages:       [the program is too slow]
+--- FAIL: TestGetDomainStat_Time_And_Memory (23.37s)
+FAIL
+FAIL    github.com/fixme_my_friend/hw10_program_optimization    23.378s
+FAIL
+
+after
+go test -v -count=1 -timeout=30s -tags bench .
+=== RUN   TestGetDomainStat_Time_And_Memory
+    stats_optimization_test.go:46: time used: 252.945082ms / 300ms
+    stats_optimization_test.go:47: memory used: 2Mb / 30Mb
+--- PASS: TestGetDomainStat_Time_And_Memory (3.81s)
+PASS
+ok      github.com/natkazb/hw-otus/hw10_program_optimization    3.817s
