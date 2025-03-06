@@ -62,4 +62,14 @@ func TestTelnetClient(t *testing.T) {
 
 		wg.Wait()
 	})
+
+	t.Run("no host", func(t *testing.T) {
+		client := NewTelnetClient("no_host:4242", time.Second*5, io.NopCloser(&bytes.Buffer{}), &bytes.Buffer{})
+		require.Error(t, client.Connect())
+	})
+
+	t.Run("timeout", func(t *testing.T) {
+		client := NewTelnetClient("localhost:4242", time.Millisecond*100, io.NopCloser(&bytes.Buffer{}), &bytes.Buffer{})
+		require.Error(t, client.Connect())
+	})
 }
