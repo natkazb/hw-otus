@@ -2,8 +2,8 @@ package main
 
 import (
 	"io"
-	"time"
 	"net"
+	"time"
 )
 
 type TelnetClient interface {
