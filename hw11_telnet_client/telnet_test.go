@@ -63,13 +63,11 @@ func TestTelnetClient(t *testing.T) {
 		wg.Wait()
 	})
 
-	t.Run("no host", func(t *testing.T) {
+	t.Run("no host & timeout", func(t *testing.T) {
+		start := time.Now()
 		client := NewTelnetClient("no_host:4242", time.Second*5, io.NopCloser(&bytes.Buffer{}), &bytes.Buffer{})
-		require.Error(t, client.Connect())
-	})
-
-	t.Run("timeout", func(t *testing.T) {
-		client := NewTelnetClient("localhost:4242", time.Millisecond*100, io.NopCloser(&bytes.Buffer{}), &bytes.Buffer{})
-		require.Error(t, client.Connect())
+		end := time.Now()
+		require.Error(t, client.Connect(), "need error wrong host")
+		require.Less(t, end.Second()-start.Second(), 5, "wrong timeout")
 	})
 }
