@@ -36,7 +36,6 @@ type SQLConf struct {
 	Host   string `yaml:"host"`
 	Port   int    `yaml:"port"`
 	DBName string `yaml:"dbName"`
-	//Driver   string `yaml:"driver"`
 	Username string `yaml:"user"`
 	Password string `yaml:"password"`
 }

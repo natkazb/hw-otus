@@ -30,10 +30,9 @@ type DefaultHandler struct{}
 
 func (h *DefaultHandler) Info(w http.ResponseWriter, _ *http.Request) {
 	w.Write([]byte("Hello world!"))
-	//time.Sleep(time.Second)
 }
 
-func NewServer(host, port string, logger Logger, app Application) *Server {
+func NewServer(host, port string, logger Logger, _ Application) *Server {
 	return &Server{
 		Address: net.JoinHostPort(host, port),
 		log:     logger,
