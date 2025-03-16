@@ -1,5 +1,15 @@
-[logger]
-level = "INFO"
-
-# TODO
-# ...
+logger:
+  level: "INFO"
+  fileName: "/tmp/calendar.log"
+storage:
+  type: "sql"
+  sql:
+    host: "localhost"
+    port: 5432
+    user: "user_cld"
+    password: "pass_cld"
+    dbName: "calendar"
+http:
+  host: "localhost"
+  port: "8080"
+  timeout: "30s"

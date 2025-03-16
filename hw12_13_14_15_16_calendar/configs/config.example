@@ -1,0 +1,15 @@
+logger:
+  level: "info" # возможные значения: error, warn, info, debug
+  fileName: "/tmp/calendar.log"
+storage:
+  type: "sql" # возможные значения: memory, sql
+  sql:
+    host: "localhost"
+    port: 5432
+    user: "***"
+    password: "***"
+    dbName: "***"
+http:
+  host: "localhost"
+  port: 8080
+  timeout: "30s"
