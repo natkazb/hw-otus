@@ -71,6 +71,8 @@ func main() {
 		os.Exit(1) //nolint:gocritic
 	}
 
+	calendar.CreateEvent(ctx, "test title")
+
 	if err := server.Start(ctx); err != nil {
 		logg.Error("failed to start http server: " + err.Error())
 		cancel()

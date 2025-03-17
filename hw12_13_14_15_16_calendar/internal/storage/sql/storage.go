@@ -6,6 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Add this import for Postgres driver
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage"
 )
 
 type Storage struct {
@@ -33,4 +34,23 @@ func (s *Storage) Close(_ context.Context) error {
 		return nil
 	}
 	return s.db.Close()
+}
+
+func (s *Storage) CreateEvent(e storage.Event) error {
+	res, err := s.db.Exec("INSERT INTO event (title, start_date, end_date, description, user_id, notify_on) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+		e.Title,
+		e.StartDate,
+		e.EndDate,
+		e.Description,
+		1, // эти поля пока не реализуем
+		1,
+	)
+
+	fmt.Printf("%v \n", res)
+
+	/*if err != nil {
+		return errors.Wrap(err, "cannot create event")
+	}*/
+
+	return err
 }
