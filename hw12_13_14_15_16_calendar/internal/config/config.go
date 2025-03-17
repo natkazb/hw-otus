@@ -38,6 +38,7 @@ type SQLConf struct {
 	DBName string `yaml:"dbName"`
 	Username string `yaml:"user"`
 	Password string `yaml:"password"`
+	Driver string `yaml:"driver"`
 }
 
 func NewConfig(filePath string) (Config, error) {

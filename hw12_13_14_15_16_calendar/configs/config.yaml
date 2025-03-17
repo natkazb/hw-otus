@@ -9,6 +9,7 @@ storage:
     user: "user_cld"
     password: "pass_cld"
     dbName: "calendar"
+    driver: "postgres"
 http:
   host: "localhost"
   port: "8080"
