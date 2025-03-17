@@ -68,7 +68,7 @@ func main() {
 	if err := storage.Connect(ctx); err != nil {
 		logg.Error("failed to start storage: " + err.Error())
 		cancel()
-		os.Exit(1) //nolint:gocritic
+		os.Exit(1)
 	}
 
 	calendar.CreateEvent(ctx, "test title")
@@ -76,6 +76,6 @@ func main() {
 	if err := server.Start(ctx); err != nil {
 		logg.Error("failed to start http server: " + err.Error())
 		cancel()
-		os.Exit(1) //nolint:gocritic
+		os.Exit(1)
 	}
 }

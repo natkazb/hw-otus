@@ -37,7 +37,7 @@ func (s *Storage) Close(_ context.Context) error {
 }
 
 func (s *Storage) CreateEvent(e storage.Event) error {
-	res, err := s.db.Exec("INSERT INTO event (title, start_date, end_date, description, user_id, notify_on) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+	_, err := s.db.Exec("INSERT INTO event (title, start_date, end_date, description, user_id, notify_on) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		e.Title,
 		e.StartDate,
 		e.EndDate,
@@ -45,12 +45,16 @@ func (s *Storage) CreateEvent(e storage.Event) error {
 		1, // эти поля пока не реализуем
 		1,
 	)
+	if err != nil {
+		return fmt.Errorf("%w: %w", storage.ErrCreateEvent, err)
+	}
+	return nil
+}
 
-	fmt.Printf("%v \n", res)
-
-	/*if err != nil {
-		return errors.Wrap(err, "cannot create event")
-	}*/
-
-	return err
+func (s *Storage) DeleteEvent(id int) error {
+	_, err := s.db.Exec("DELETE FROM event WHERE id = $1", id)
+	if err != nil {
+		return fmt.Errorf("%w: %w", storage.ErrDeleteEvent, err)
+	}
+	return nil
 }

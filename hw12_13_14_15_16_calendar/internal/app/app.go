@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"time"
-	"fmt"
 
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage"
 )
@@ -23,7 +22,7 @@ type Logger interface {
 type Storage interface {
 	CreateEvent(e storage.Event) error
 	//UpdateEvent(e storage.Event) error
-	//DeleteEvent(e storage.Event) error
+	DeleteEvent(id int) error
 	//ListEvents(startData, endData time.Time) ([]storage.Event, error)
 }
 
@@ -37,8 +36,16 @@ func New(logger Logger, storage Storage) *App {
 func (a *App) CreateEvent(_ context.Context, title string) error {
 	now := time.Now()
 	err := a.storage.CreateEvent(storage.Event{Title: title, StartDate: now, EndDate: now.Add(1000), Description: "testing"})
-	if (err != nil) {
-		a.log.Error(fmt.Sprintf("error in CreateEvent: %v", err))
+	if err != nil {
+		a.log.Error(err.Error())
+	}
+	return err
+}
+
+func (a *App) DeleteEvent(_ context.Context, id int) error {
+	err := a.storage.DeleteEvent(id)
+	if err != nil {
+		a.log.Error(err.Error())
 	}
 	return err
 }
