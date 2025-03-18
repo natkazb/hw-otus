@@ -3,6 +3,7 @@ package sqlstorage
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Add this import for Postgres driver
@@ -17,7 +18,6 @@ type Storage struct {
 
 func New(driver, host string, port int, dbName, user, pass string) *Storage {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, pass, dbName)
-	//dsn := fmt.Sprintf("%s://%s:%s@%s:%v/%s?sslmode=disable", driver, user, pass, host, port, dbName)
 	return &Storage{
 		Dsn:    dsn,
 		Driver: driver,
@@ -45,16 +45,31 @@ func (s *Storage) CreateEvent(e storage.Event) error {
 		1, // эти поля пока не реализуем
 		1,
 	)
-	if err != nil {
-		return fmt.Errorf("%w: %w", storage.ErrCreateEvent, err)
-	}
-	return nil
+	return err
 }
 
 func (s *Storage) DeleteEvent(id int) error {
 	_, err := s.db.Exec("DELETE FROM event WHERE id = $1", id)
-	if err != nil {
-		return fmt.Errorf("%w: %w", storage.ErrDeleteEvent, err)
-	}
-	return nil
+	return err
+}
+
+func (s *Storage) UpdateEvent(e storage.Event) error {
+	_, err := s.db.Exec("UPDATE event SET title = $2, start_date = $3, end_date = $4, description = $5 WHERE id = $1",
+		e.ID,
+		e.Title,
+		e.StartDate,
+		e.EndDate,
+		e.Description,
+	)
+	return err
+}
+
+func (s *Storage) ListEvents(startData, endData time.Time) ([]storage.Event, error) {
+	events := make([]storage.Event, 0)
+	err := s.db.Select(&events, `
+SELECT id, title, start_date, end_date, description
+FROM event
+WHERE start_date >= $1 AND start_date <= $2`,
+		startData, endData)
+	return events, err
 }
