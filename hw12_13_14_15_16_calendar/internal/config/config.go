@@ -33,25 +33,25 @@ type Storage struct {
 }
 
 type SQLConf struct {
-	Host   string `yaml:"host"`
-	Port   int    `yaml:"port"`
-	DBName string `yaml:"dbName"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	DBName   string `yaml:"dbName"`
 	Username string `yaml:"user"`
 	Password string `yaml:"password"`
-	Driver string `yaml:"driver"`
+	Driver   string `yaml:"driver"`
 }
 
 func NewConfig(filePath string) (Config, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return Config{}, fmt.Errorf("Error in opening file %s: %w", filePath, err)
+		return Config{}, fmt.Errorf("error in opening file %s: %w", filePath, err)
 	}
 	defer file.Close()
 
 	decoder := yaml.NewDecoder(file)
 	var config Config
 	if err := decoder.Decode(&config); err != nil {
-		return Config{}, fmt.Errorf("Error in decoding %s: %w", filePath, err)
+		return Config{}, fmt.Errorf("error in decoding %s: %w", filePath, err)
 	}
 	return config, nil
 }

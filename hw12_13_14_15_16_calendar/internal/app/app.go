@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage"
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage" //nolint
 )
 
 type App struct {

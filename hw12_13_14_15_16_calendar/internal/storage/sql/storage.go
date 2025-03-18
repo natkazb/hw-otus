@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq" // Add this import for Postgres driver
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage"
+	_ "github.com/lib/pq"                                                   // Add this import for Postgres driver
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage" //nolint
 )
 
 type Storage struct {
@@ -37,7 +37,10 @@ func (s *Storage) Close(_ context.Context) error {
 }
 
 func (s *Storage) CreateEvent(e storage.Event) error {
-	_, err := s.db.Exec("INSERT INTO event (title, start_date, end_date, description, user_id, notify_on) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+	_, err := s.db.Exec(`INSERT INTO event 
+	(title, start_date, end_date, description, user_id, notify_on) 
+	VALUES ($1, $2, $3, $4, $5, $6) 
+	RETURNING id`,
 		e.Title,
 		e.StartDate,
 		e.EndDate,
@@ -54,7 +57,12 @@ func (s *Storage) DeleteEvent(id int) error {
 }
 
 func (s *Storage) UpdateEvent(e storage.Event) error {
-	_, err := s.db.Exec("UPDATE event SET title = $2, start_date = $3, end_date = $4, description = $5 WHERE id = $1",
+	_, err := s.db.Exec(`UPDATE event SET 
+	title = $2, 
+	start_date = $3, 
+	end_date = $4, 
+	description = $5 
+	WHERE id = $1`,
 		e.ID,
 		e.Title,
 		e.StartDate,

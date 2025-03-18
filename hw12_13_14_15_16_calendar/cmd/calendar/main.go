@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/app"
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/config"
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/logger"
-	internalhttp "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/http"
-	sqlstorage "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage/sql"
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/app"                      //nolint
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/config"                   //nolint
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/logger"                   //nolint
+	internalhttp "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/http" //nolint
+	sqlstorage "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage/sql"   //nolint
 )
 
 var configFile string
@@ -38,15 +38,20 @@ func main() {
 
 	logg := logger.New(conf.Logger.Level)
 
-	//storage := memorystorage.New()
-	storage := sqlstorage.New(conf.Storage.SQL.Driver, conf.Storage.SQL.Host, conf.Storage.SQL.Port, conf.Storage.SQL.DBName, conf.Storage.SQL.Username, conf.Storage.SQL.Password)
+	// storage := memorystorage.New()
+	storage := sqlstorage.New(conf.Storage.SQL.Driver,
+		conf.Storage.SQL.Host,
+		conf.Storage.SQL.Port,
+		conf.Storage.SQL.DBName,
+		conf.Storage.SQL.Username,
+		conf.Storage.SQL.Password)
 	calendar := app.New(logg, storage)
 
 	server := internalhttp.NewServer(conf.HTTP.Host, conf.HTTP.Port, logg, calendar)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-	defer cancel()
+	// defer cancel()
 
 	go func() {
 		<-ctx.Done()
@@ -73,7 +78,7 @@ func main() {
 
 	calendar.CreateEvent(ctx, "test title")
 	now := time.Now()
-	items, err := calendar.ListEvents(now.Add(-48*time.Hour), now.Add(20 * time.Minute))
+	items, _ := calendar.ListEvents(now.Add(-48*time.Hour), now.Add(20*time.Minute))
 	fmt.Println(items)
 
 	if err := server.Start(ctx); err != nil {
