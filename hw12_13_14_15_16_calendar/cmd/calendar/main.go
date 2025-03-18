@@ -25,10 +25,10 @@ func init() {
 func main() {
 	flag.Parse()
 
-	/*if flag.Arg(0) == "version" {
-		printVersion()
+	if flag.Arg(0) == "version" {
+		PrintVersion()
 		return
-	}*/
+	}
 
 	conf, err := config.NewConfig(configFile)
 	if err != nil {
