@@ -1,1 +1,19 @@
-version: "3"
+services:
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    volumes:
+      - .:/docker-entrypoint-initdb.d
+      - calendar-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: "calendar"
+      POSTGRES_USER: "user_cld"
+      POSTGRES_PASSWORD: "pass_cld"  
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+
+volumes:
+  calendar-data:

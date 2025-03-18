@@ -16,6 +16,10 @@ linters-settings:
           - "!$test"
         allow:
           - $gostd
+          - github.com/jmoiron/sqlx
+          - github.com/lib/pq
+          - github.com/pkg/errors
+          - gopkg.in/yaml.v3
       Test:
         files:
           - $test
