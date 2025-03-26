@@ -1,3 +1,6 @@
+MIGRATION_DIR=migrations
+DB_STRING="postgres://user_cld:pass_cld@localhost:5432/calendar?sslmode=disable"
+
 BIN := "./bin/calendar"
 DOCKER_IMG="calendar:develop"
 
@@ -8,7 +11,7 @@ build:
 	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
 
 run: build
-	$(BIN) -config ./configs/config.toml
+	$(BIN) -config ./configs/config.yaml
 
 build-img:
 	docker build \
@@ -23,12 +26,30 @@ version: build
 	$(BIN) version
 
 test:
-	go test -race ./internal/... ./pkg/...
+	go test -race ./internal/...
 
 install-lint-deps:
-	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.57.2
+	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.64.8
 
 lint: install-lint-deps
 	golangci-lint run ./...
 
 .PHONY: build run build-img run-img version test lint
+
+install-goose:
+	go install github.com/pressly/goose/v3/cmd/goose@latest
+
+migration-create:
+	goose -dir $(MIGRATION_DIR) create $(name) sql
+
+migration-up:
+	goose -dir $(MIGRATION_DIR) postgres $(DB_STRING) up
+
+migration-down:
+	goose -dir $(MIGRATION_DIR) postgres $(DB_STRING) down
+
+migration-status:
+	goose -dir $(MIGRATION_DIR) postgres $(DB_STRING) status
+
+migration-reset:
+	goose -dir $(MIGRATION_DIR) postgres $(DB_STRING) reset
