@@ -36,7 +36,7 @@ func (s *Storage) Close(_ context.Context) error {
 	return s.db.Close()
 }
 
-func (s *Storage) CreateEvent(e storage.Event) error {
+func (s *Storage) CreateEvent(e storage.EventDB) error {
 	_, err := s.db.Exec(`INSERT INTO event 
 	(title, start_date, end_date, description, user_id, notify_on) 
 	VALUES ($1, $2, $3, $4, $5, $6) 
@@ -77,7 +77,7 @@ func (s *Storage) ListEvents(startData, endData time.Time) ([]storage.Event, err
 	err := s.db.Select(&events, `
 SELECT id, title, start_date, end_date, description
 FROM event
-WHERE start_date >= $1 AND start_date <= $2`,
+WHERE start_date >= $1 AND start_date < $2`,
 		startData, endData)
 	return events, err
 }

@@ -76,11 +76,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	calendar.CreateEvent(ctx, "test title")
-	now := time.Now()
-	items, _ := calendar.ListEvents(now.Add(-48*time.Hour), now.Add(20*time.Minute))
-	fmt.Println(items)
-
 	if err := server.Start(ctx); err != nil {
 		logg.Error("failed to start http server: " + err.Error())
 		cancel()
