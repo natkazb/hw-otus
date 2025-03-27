@@ -55,7 +55,9 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 	err := s.server.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return errors.Wrap(err, "start server error")
+		errWrapped := errors.Wrap(err, "start server error")
+		s.log.Error(errWrapped.Error())
+		return errWrapped
 	}
 
 	<-ctx.Done()
@@ -67,6 +69,6 @@ func (s *Server) Stop(ctx context.Context) error {
 		s.log.Error(fmt.Sprintf("server shutdown error: %v", err))
 		return err
 	}
-	s.log.Info("server stopped")
+	s.log.Info("server http stopped")
 	return nil
 }

@@ -13,6 +13,7 @@ import (
 type Config struct {
 	Logger  LoggerConf `yaml:"logger"`
 	HTTP    HTTPConf   `yaml:"http"`
+	GRPC    GRPCConf   `yaml:"grpc"`
 	Storage Storage    `yaml:"storage"`
 }
 
@@ -22,6 +23,12 @@ type LoggerConf struct {
 }
 
 type HTTPConf struct {
+	Host    string `yaml:"host"`
+	Port    string `yaml:"port"`
+	Timeout string `yaml:"timeout"`
+}
+
+type GRPCConf struct {
 	Host    string `yaml:"host"`
 	Port    string `yaml:"port"`
 	Timeout string `yaml:"timeout"`

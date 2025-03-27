@@ -14,3 +14,7 @@ http:
   host: "localhost"
   port: "8080"
   timeout: "30s"
+grpc:
+  host: ""
+  port: "50051"
+  timeout: "30s"

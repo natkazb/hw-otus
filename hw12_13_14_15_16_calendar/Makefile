@@ -53,3 +53,12 @@ migration-status:
 
 migration-reset:
 	goose -dir $(MIGRATION_DIR) postgres $(DB_STRING) reset
+
+generate:
+	rm -rf ./internal/server/grpc/pb
+	mkdir -p ./internal/server/grpc/pb
+
+	protoc \
+		--go_out=./internal/server/grpc \
+		--go-grpc_out=./internal/server/grpc \
+		./api/*.proto

@@ -12,7 +12,8 @@ import (
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/app"                      //nolint
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/config"                   //nolint
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/logger"                   //nolint
-	internalhttp "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/http" //nolint
+	internalgrpc "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/grpc" //nolint
+	//internalhttp "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/http" //nolint
 	sqlstorage "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage/sql"   //nolint
 )
 
@@ -47,7 +48,8 @@ func main() {
 		conf.Storage.SQL.Password)
 	calendar := app.New(logg, storage)
 
-	server := internalhttp.NewServer(conf.HTTP.Host, conf.HTTP.Port, logg, calendar)
+	//server := internalhttp.NewServer(conf.HTTP.Host, conf.HTTP.Port, logg, calendar)
+	serverGrpc := internalgrpc.NewServer(conf.GRPC.Host, conf.GRPC.Port, logg, calendar)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -63,8 +65,11 @@ func main() {
 			logg.Error("failed to stop storage: " + err.Error())
 		}
 
-		if err := server.Stop(ctx); err != nil {
+		/*if err := server.Stop(ctx); err != nil {
 			logg.Error("failed to stop http server: " + err.Error())
+		}*/
+		if err := serverGrpc.Stop(ctx); err != nil {
+			logg.Error("failed to stop grpc server: " + err.Error())
 		}
 	}()
 
@@ -76,9 +81,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := server.Start(ctx); err != nil {
-		logg.Error("failed to start http server: " + err.Error())
+	if err := serverGrpc.Start(ctx); err != nil {
+		logg.Error("failed to start grpc server: " + err.Error())
 		cancel()
 		os.Exit(1)
 	}
+
+	/*if err := server.Start(ctx); err != nil {
+		logg.Error("failed to start http server: " + err.Error())
+		cancel()
+		os.Exit(1)
+	} */
 }
