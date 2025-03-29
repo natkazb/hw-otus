@@ -36,8 +36,8 @@ func (s *Storage) Close(_ context.Context) error {
 	return s.db.Close()
 }
 
-func (s *Storage) CreateEvent(e storage.EventDB) error {
-	_, err := s.db.Exec(`INSERT INTO event 
+func (s *Storage) CreateEvent4(e storage.EventDB) error {
+	res, err := s.db.Exec(`INSERT INTO event 
 	(title, start_date, end_date, description, user_id, notify_on) 
 	VALUES ($1, $2, $3, $4, $5, $6) 
 	RETURNING id`,
@@ -48,10 +48,30 @@ func (s *Storage) CreateEvent(e storage.EventDB) error {
 		1, // эти поля пока не реализуем
 		1,
 	)
+	fmt.Printf("%v", res)
 	return err
 }
 
-func (s *Storage) DeleteEvent(id int) error {
+func (s *Storage) CreateEvent(e storage.EventDB) (int32, error) {
+	var id int32
+	err := s.db.QueryRow(`INSERT INTO event 
+	(title, start_date, end_date, description, user_id, notify_on) 
+	VALUES ($1, $2, $3, $4, $5, $6) 
+	RETURNING id`,
+		e.Title,
+		e.StartDate,
+		e.EndDate,
+		e.Description,
+		1, // эти поля пока не реализуем
+		1,
+	).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func (s *Storage) DeleteEvent(id int32) error {
 	_, err := s.db.Exec("DELETE FROM event WHERE id = $1", id)
 	return err
 }

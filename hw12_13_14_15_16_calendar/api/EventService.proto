@@ -15,6 +15,14 @@ message CreateEventResponse {
     int32 id = 1;
 }
 
+message DeleteEventRequest {
+    int32 id = 1;
+}
+
+message DeleteEventResponse {
+}
+
 service EventService {
     rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+    rpc DeleteEvent (DeleteEventRequest) returns (DeleteEventResponse);
 }

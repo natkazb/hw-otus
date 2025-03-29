@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -21,9 +20,9 @@ type Logger interface {
 }
 
 type Storage interface {
-	CreateEvent(e storage.EventDB) error
+	CreateEvent(e storage.EventDB) (int32, error)
 	UpdateEvent(e storage.Event) error
-	DeleteEvent(id int) error
+	DeleteEvent(id int32) error
 	ListEvents(startData, endData time.Time) ([]storage.Event, error)
 }
 
@@ -34,20 +33,20 @@ func New(logger Logger, storage Storage) *App {
 	}
 }
 
-func (a *App) CreateEvent(event storage.Event) error {
+func (a *App) CreateEvent(event storage.Event) (int32, error) {
 	err := event.Validate()
 	if err != nil {
 		a.log.Error(err.Error())
-		return err
+		return 0, err
 	}
-	err = a.storage.CreateEvent(event.CopyToEventDB())
+	id, err := a.storage.CreateEvent(event.CopyToEventDB())
 	if err != nil {
 		a.log.Error(fmt.Errorf("%w: %w", storage.ErrCreateEvent, err).Error())
 	}
-	return err
+	return id, err
 }
 
-func (a *App) DeleteEvent(_ context.Context, id int) error {
+func (a *App) DeleteEvent(id int32) error {
 	err := a.storage.DeleteEvent(id)
 	if err != nil {
 		a.log.Error(fmt.Errorf("%w id=%d: %w", storage.ErrDeleteEvent, id, err).Error())

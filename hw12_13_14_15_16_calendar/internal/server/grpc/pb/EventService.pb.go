@@ -133,6 +133,86 @@ func (x *CreateEventResponse) GetId() int32 {
 	return 0
 }
 
+type DeleteEventRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteEventRequest) Reset() {
+	*x = DeleteEventRequest{}
+	mi := &file_api_EventService_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteEventRequest) ProtoMessage() {}
+
+func (x *DeleteEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_EventService_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteEventRequest.ProtoReflect.Descriptor instead.
+func (*DeleteEventRequest) Descriptor() ([]byte, []int) {
+	return file_api_EventService_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *DeleteEventRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type DeleteEventResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteEventResponse) Reset() {
+	*x = DeleteEventResponse{}
+	mi := &file_api_EventService_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteEventResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteEventResponse) ProtoMessage() {}
+
+func (x *DeleteEventResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_EventService_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteEventResponse.ProtoReflect.Descriptor instead.
+func (*DeleteEventResponse) Descriptor() ([]byte, []int) {
+	return file_api_EventService_proto_rawDescGZIP(), []int{3}
+}
+
 var File_api_EventService_proto protoreflect.FileDescriptor
 
 const file_api_EventService_proto_rawDesc = "" +
@@ -144,9 +224,13 @@ const file_api_EventService_proto_rawDesc = "" +
 	"\tstartDate\x18\x03 \x01(\tR\tstartDate\x12\x18\n" +
 	"\aendDate\x18\x04 \x01(\tR\aendDate\"%\n" +
 	"\x13CreateEventResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id2T\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"$\n" +
+	"\x12DeleteEventRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\x15\n" +
+	"\x13DeleteEventResponse2\x9a\x01\n" +
 	"\fEventService\x12D\n" +
-	"\vCreateEvent\x12\x19.event.CreateEventRequest\x1a\x1a.event.CreateEventResponseB\x06Z\x04./pbb\x06proto3"
+	"\vCreateEvent\x12\x19.event.CreateEventRequest\x1a\x1a.event.CreateEventResponse\x12D\n" +
+	"\vDeleteEvent\x12\x19.event.DeleteEventRequest\x1a\x1a.event.DeleteEventResponseB\x06Z\x04./pbb\x06proto3"
 
 var (
 	file_api_EventService_proto_rawDescOnce sync.Once
@@ -160,16 +244,20 @@ func file_api_EventService_proto_rawDescGZIP() []byte {
 	return file_api_EventService_proto_rawDescData
 }
 
-var file_api_EventService_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_api_EventService_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_api_EventService_proto_goTypes = []any{
 	(*CreateEventRequest)(nil),  // 0: event.CreateEventRequest
 	(*CreateEventResponse)(nil), // 1: event.CreateEventResponse
+	(*DeleteEventRequest)(nil),  // 2: event.DeleteEventRequest
+	(*DeleteEventResponse)(nil), // 3: event.DeleteEventResponse
 }
 var file_api_EventService_proto_depIdxs = []int32{
 	0, // 0: event.EventService.CreateEvent:input_type -> event.CreateEventRequest
-	1, // 1: event.EventService.CreateEvent:output_type -> event.CreateEventResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	2, // 1: event.EventService.DeleteEvent:input_type -> event.DeleteEventRequest
+	1, // 2: event.EventService.CreateEvent:output_type -> event.CreateEventResponse
+	3, // 3: event.EventService.DeleteEvent:output_type -> event.DeleteEventResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -186,7 +274,7 @@ func file_api_EventService_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_EventService_proto_rawDesc), len(file_api_EventService_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -27,9 +27,9 @@ type Server struct {
 }
 
 type Application interface {
-	CreateEvent(e storage.Event) error
-	//UpdateEvent(e storage.Event) error
-	//DeleteEvent(id int) error
+	CreateEvent(e storage.Event) (int32, error)
+	UpdateEvent(e storage.Event) error
+	DeleteEvent(id int32) error
 	ListEvents(startData, endData time.Time) ([]storage.Event, error)
 }
 
