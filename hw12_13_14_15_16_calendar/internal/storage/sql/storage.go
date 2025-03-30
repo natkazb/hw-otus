@@ -36,22 +36,6 @@ func (s *Storage) Close(_ context.Context) error {
 	return s.db.Close()
 }
 
-func (s *Storage) CreateEvent4(e storage.EventDB) error {
-	res, err := s.db.Exec(`INSERT INTO event 
-	(title, start_date, end_date, description, user_id, notify_on) 
-	VALUES ($1, $2, $3, $4, $5, $6) 
-	RETURNING id`,
-		e.Title,
-		e.StartDate,
-		e.EndDate,
-		e.Description,
-		1, // эти поля пока не реализуем
-		1,
-	)
-	fmt.Printf("%v", res)
-	return err
-}
-
 func (s *Storage) CreateEvent(e storage.EventDB) (int32, error) {
 	var id int32
 	err := s.db.QueryRow(`INSERT INTO event 

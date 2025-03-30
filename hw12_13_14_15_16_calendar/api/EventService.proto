@@ -22,7 +22,54 @@ message DeleteEventRequest {
 message DeleteEventResponse {
 }
 
+message UpdateEventRequest {
+    int32 id = 1;
+    string title = 2;
+    string description = 3;
+    string startDate = 4;
+    string endDate = 5;
+}
+
+message UpdateEventResponse {
+}
+
+message ListDayEventRequest {
+    string day = 1;
+}
+
+message EventList {
+    int32 id = 1;
+    string title = 2;
+    string description = 3;
+    string startDate = 4;
+    string endDate = 5;
+}
+
+message ListDayEventResponse {
+    repeated EventList events = 1;
+}
+
+message ListWeekEventRequest {
+    string day = 1;
+}
+
+message ListWeekEventResponse {
+    repeated EventList events = 1;
+}
+
+message ListMonthEventRequest {
+    string day = 1;
+}
+
+message ListMonthEventResponse {
+    repeated EventList events = 1;
+}
+
 service EventService {
     rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
     rpc DeleteEvent (DeleteEventRequest) returns (DeleteEventResponse);
+    rpc UpdateEvent (UpdateEventRequest) returns (UpdateEventResponse);
+    rpc ListDay (ListDayEventRequest) returns (ListDayEventResponse);
+    rpc ListWeek (ListWeekEventRequest) returns (ListWeekEventResponse);
+    rpc ListMonth (ListMonthEventRequest) returns (ListMonthEventResponse);
 }

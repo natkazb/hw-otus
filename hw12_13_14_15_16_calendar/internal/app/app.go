@@ -55,7 +55,7 @@ func (a *App) DeleteEvent(id int32) error {
 }
 
 func (a *App) UpdateEvent(event storage.Event) error {
-	err := event.Validate()
+	err := event.ValidateUpdate()
 	if err != nil {
 		a.log.Error(err.Error())
 		return err

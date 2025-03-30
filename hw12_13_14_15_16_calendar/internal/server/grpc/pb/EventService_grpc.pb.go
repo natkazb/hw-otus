@@ -21,6 +21,10 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	EventService_CreateEvent_FullMethodName = "/event.EventService/CreateEvent"
 	EventService_DeleteEvent_FullMethodName = "/event.EventService/DeleteEvent"
+	EventService_UpdateEvent_FullMethodName = "/event.EventService/UpdateEvent"
+	EventService_ListDay_FullMethodName     = "/event.EventService/ListDay"
+	EventService_ListWeek_FullMethodName    = "/event.EventService/ListWeek"
+	EventService_ListMonth_FullMethodName   = "/event.EventService/ListMonth"
 )
 
 // EventServiceClient is the client API for EventService service.
@@ -29,6 +33,10 @@ const (
 type EventServiceClient interface {
 	CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*CreateEventResponse, error)
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*DeleteEventResponse, error)
+	UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*UpdateEventResponse, error)
+	ListDay(ctx context.Context, in *ListDayEventRequest, opts ...grpc.CallOption) (*ListDayEventResponse, error)
+	ListWeek(ctx context.Context, in *ListWeekEventRequest, opts ...grpc.CallOption) (*ListWeekEventResponse, error)
+	ListMonth(ctx context.Context, in *ListMonthEventRequest, opts ...grpc.CallOption) (*ListMonthEventResponse, error)
 }
 
 type eventServiceClient struct {
@@ -59,12 +67,56 @@ func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *DeleteEventReq
 	return out, nil
 }
 
+func (c *eventServiceClient) UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*UpdateEventResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateEventResponse)
+	err := c.cc.Invoke(ctx, EventService_UpdateEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventServiceClient) ListDay(ctx context.Context, in *ListDayEventRequest, opts ...grpc.CallOption) (*ListDayEventResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListDayEventResponse)
+	err := c.cc.Invoke(ctx, EventService_ListDay_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventServiceClient) ListWeek(ctx context.Context, in *ListWeekEventRequest, opts ...grpc.CallOption) (*ListWeekEventResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListWeekEventResponse)
+	err := c.cc.Invoke(ctx, EventService_ListWeek_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventServiceClient) ListMonth(ctx context.Context, in *ListMonthEventRequest, opts ...grpc.CallOption) (*ListMonthEventResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListMonthEventResponse)
+	err := c.cc.Invoke(ctx, EventService_ListMonth_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventServiceServer is the server API for EventService service.
 // All implementations must embed UnimplementedEventServiceServer
 // for forward compatibility.
 type EventServiceServer interface {
 	CreateEvent(context.Context, *CreateEventRequest) (*CreateEventResponse, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error)
+	UpdateEvent(context.Context, *UpdateEventRequest) (*UpdateEventResponse, error)
+	ListDay(context.Context, *ListDayEventRequest) (*ListDayEventResponse, error)
+	ListWeek(context.Context, *ListWeekEventRequest) (*ListWeekEventResponse, error)
+	ListMonth(context.Context, *ListMonthEventRequest) (*ListMonthEventResponse, error)
 	mustEmbedUnimplementedEventServiceServer()
 }
 
@@ -80,6 +132,18 @@ func (UnimplementedEventServiceServer) CreateEvent(context.Context, *CreateEvent
 }
 func (UnimplementedEventServiceServer) DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEvent not implemented")
+}
+func (UnimplementedEventServiceServer) UpdateEvent(context.Context, *UpdateEventRequest) (*UpdateEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateEvent not implemented")
+}
+func (UnimplementedEventServiceServer) ListDay(context.Context, *ListDayEventRequest) (*ListDayEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDay not implemented")
+}
+func (UnimplementedEventServiceServer) ListWeek(context.Context, *ListWeekEventRequest) (*ListWeekEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListWeek not implemented")
+}
+func (UnimplementedEventServiceServer) ListMonth(context.Context, *ListMonthEventRequest) (*ListMonthEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListMonth not implemented")
 }
 func (UnimplementedEventServiceServer) mustEmbedUnimplementedEventServiceServer() {}
 func (UnimplementedEventServiceServer) testEmbeddedByValue()                      {}
@@ -138,6 +202,78 @@ func _EventService_DeleteEvent_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventService_UpdateEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServiceServer).UpdateEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventService_UpdateEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServiceServer).UpdateEvent(ctx, req.(*UpdateEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EventService_ListDay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDayEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServiceServer).ListDay(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventService_ListDay_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServiceServer).ListDay(ctx, req.(*ListDayEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EventService_ListWeek_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListWeekEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServiceServer).ListWeek(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventService_ListWeek_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServiceServer).ListWeek(ctx, req.(*ListWeekEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EventService_ListMonth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMonthEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServiceServer).ListMonth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventService_ListMonth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServiceServer).ListMonth(ctx, req.(*ListMonthEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EventService_ServiceDesc is the grpc.ServiceDesc for EventService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +288,22 @@ var EventService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteEvent",
 			Handler:    _EventService_DeleteEvent_Handler,
+		},
+		{
+			MethodName: "UpdateEvent",
+			Handler:    _EventService_UpdateEvent_Handler,
+		},
+		{
+			MethodName: "ListDay",
+			Handler:    _EventService_ListDay_Handler,
+		},
+		{
+			MethodName: "ListWeek",
+			Handler:    _EventService_ListWeek_Handler,
+		},
+		{
+			MethodName: "ListMonth",
+			Handler:    _EventService_ListMonth_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

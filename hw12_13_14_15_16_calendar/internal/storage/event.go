@@ -7,10 +7,12 @@ import (
 
 type EventDateTime time.Time
 
+//type EventDateTime struct { time.Time }
+
 const dateTimeLayout = "2006-01-02 15:04"
 
 type Event struct {
-	ID          int
+	ID          int32
 	Title       string        `json:"title"`
 	StartDate   EventDateTime `db:"start_date" json:"startDate"`
 	EndDate     EventDateTime `db:"end_date" json:"endDate"`
@@ -18,14 +20,15 @@ type Event struct {
 }
 
 type EventDB struct {
-	ID          int
+	ID          int32
 	Title       string
 	StartDate   time.Time `db:"start_date"`
 	EndDate     time.Time `db:"end_date"`
 	Description string
 }
 
-type EventCreateGrpc struct {
+type EventModifyGrpc struct {
+	ID          int32
 	Title       string
 	StartDate   string
 	EndDate     string
@@ -38,6 +41,7 @@ var (
 	ErrUpdateEvent      = errors.New("can't update event")
 	ErrDates            = errors.New("end date < start date")
 	ErrList             = errors.New("can't select events")
+	ErrEmptyId          = errors.New("empty id")
 	ErrEmptyTitle       = errors.New("empty title")
 	ErrEmptyDescription = errors.New("empty description")
 	ErrEmptyStartDate   = errors.New("empty start date")
@@ -73,20 +77,18 @@ func (e *Event) Validate() error {
 	if e.Description == "" {
 		return ErrEmptyDescription
 	}
-	if e.StartDate.Compare(e.EndDate) > 0 {
-		return ErrDates
-	}
 	return nil
 }
 
-func (e *EventCreateGrpc) ValidateCreateGrpcAndReturnParsedDates() (EventDateTime, EventDateTime, error) {
+func (e *Event) ValidateUpdate() error {
+	if e.ID == 0 {
+		return ErrEmptyId
+	}
+	return e.Validate()
+}
+
+func (e *EventModifyGrpc) ValidateCreateGrpcAndReturnParsedDates() (EventDateTime, EventDateTime, error) {
 	defaultTime := EventDateTime(time.Now())
-	if e.Title == "" {
-		return defaultTime, defaultTime, ErrEmptyTitle
-	}
-	if e.Description == "" {
-		return defaultTime, defaultTime, ErrEmptyDescription
-	}
 	if e.StartDate == "" {
 		return defaultTime, defaultTime, ErrEmptyStartDate
 	}
@@ -118,6 +120,11 @@ func (ct EventDateTime) Compare(other EventDateTime) int {
 	return 0
 }
 
+func (ct EventDateTime) String() string {
+	timeDay := time.Time(ct)
+	return timeDay.String()
+}
+
 func (e *Event) CopyToEventDB() EventDB {
 	eDB := EventDB{
 		ID:          e.ID,
@@ -129,8 +136,9 @@ func (e *Event) CopyToEventDB() EventDB {
 	return eDB
 }
 
-func (e *EventCreateGrpc) CopyToEvent(startDate, endDate EventDateTime) Event {
+func (e *EventModifyGrpc) CopyToEvent(startDate, endDate EventDateTime) Event {
 	eCopy := Event{
+		ID:          e.ID,
 		Title:       e.Title,
 		StartDate:   startDate,
 		EndDate:     endDate,
