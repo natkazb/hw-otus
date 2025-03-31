@@ -35,6 +35,10 @@ type EventModifyGrpc struct {
 	Description string
 }
 
+type DeleteEvent struct {
+	ID int32 `json:"id"`
+}
+
 var (
 	ErrCreateEvent      = errors.New("can't creating new event")
 	ErrDeleteEvent      = errors.New("can't delete event")

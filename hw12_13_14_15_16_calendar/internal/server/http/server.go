@@ -26,9 +26,9 @@ type Server struct {
 }
 
 type Application interface {
-	CreateEvent(e storage.Event) error
-	//UpdateEvent(e storage.Event) error
-	//DeleteEvent(id int) error
+	CreateEvent(e storage.Event) (int32, error)
+	UpdateEvent(e storage.Event) error
+	DeleteEvent(id int32) error
 	ListEvents(startData, endData time.Time) ([]storage.Event, error)
 }
 
@@ -47,6 +47,8 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.HandleFunc("GET /events/list-week", loggingMiddleware(eventHandler.ListWeek, s.log))
 	mux.HandleFunc("GET /events/list-month", loggingMiddleware(eventHandler.ListMonth, s.log))
 	mux.HandleFunc("POST /event/create", loggingMiddleware(eventHandler.Create, s.log))
+	mux.HandleFunc("POST /event/update", loggingMiddleware(eventHandler.Update, s.log))
+	mux.HandleFunc("POST /event/delete", loggingMiddleware(eventHandler.Delete, s.log))
 	s.server = http.Server{
 		Addr:         s.Address,
 		Handler:      mux,
