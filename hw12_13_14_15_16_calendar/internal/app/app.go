@@ -21,7 +21,7 @@ type Logger interface {
 
 type Storage interface {
 	CreateEvent(e storage.EventDB) (int32, error)
-	UpdateEvent(e storage.Event) error
+	UpdateEvent(e storage.EventDB) error
 	DeleteEvent(id int32) error
 	ListEvents(startData, endData time.Time) ([]storage.Event, error)
 }
@@ -60,7 +60,7 @@ func (a *App) UpdateEvent(event storage.Event) error {
 		a.log.Error(err.Error())
 		return err
 	}
-	err = a.storage.UpdateEvent(event)
+	err = a.storage.UpdateEvent(event.CopyToEventDB())
 	if err != nil {
 		a.log.Error(fmt.Errorf("%w id=%d: %w", storage.ErrUpdateEvent, event.ID, err).Error())
 	}
