@@ -60,7 +60,7 @@ func (s *Storage) DeleteEvent(id int32) error {
 	return err
 }
 
-func (s *Storage) UpdateEvent(e storage.Event) error {
+func (s *Storage) UpdateEvent(e storage.EventDB) error {
 	_, err := s.db.Exec(`UPDATE event SET 
 	title = $2, 
 	start_date = $3, 

@@ -34,30 +34,18 @@ type Application interface {
 }
 
 func NewServer(host, port string, logger Logger, app Application) *Server {
+	newServ := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			logging(logger),
+		),
+	)
 	return &Server{
 		Address: net.JoinHostPort(host, port),
 		log:     logger,
 		app:     app,
-		server:  grpc.NewServer(),
+		server:  newServ,
 	}
 }
-
-/*func (s *Server) Start(ctx context.Context) error {
-	lsn, err := net.Listen("tcp", s.Address)
-	if err != nil {
-		return err
-	}
-
-	s.server = grpc.NewServer(
-		grpc.ChainUnaryInterceptor(
-			NewLoggerInterceptor(s.log).GetInterceptor(),
-		),
-	)
-	pb.RegisterEventServiceServer(s.server, NewService(s.app))
-	reflection.Register(s.server)
-
-	return s.grpcServer.Serve(lsn)
-} */
 
 func (s *Server) Start(ctx context.Context) error {
 	lis, err := net.Listen("tcp", s.Address)
