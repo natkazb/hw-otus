@@ -20,7 +20,7 @@ type EventHandler struct {
 	app Application
 }
 
-func (h *EventHandler) list(startData, endData time.Time, w http.ResponseWriter, r *http.Request) {
+func (h *EventHandler) list(startData, endData time.Time, w http.ResponseWriter) {
 	items, err := h.app.ListEvents(startData, endData)
 	if err != nil {
 		jsonError(w, err.Error(), http.StatusInternalServerError)
@@ -47,7 +47,7 @@ func (h *EventHandler) ListDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.list(dayParsed, dayParsed.Add(24*time.Hour), w, r)
+	h.list(dayParsed, dayParsed.Add(24*time.Hour), w)
 }
 
 func (h *EventHandler) ListWeek(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +64,7 @@ func (h *EventHandler) ListWeek(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.list(dayParsed, dayParsed.Add(7*24*time.Hour), w, r)
+	h.list(dayParsed, dayParsed.Add(7*24*time.Hour), w)
 }
 
 func (h *EventHandler) ListMonth(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +82,7 @@ func (h *EventHandler) ListMonth(w http.ResponseWriter, r *http.Request) {
 	}
 	endDate := dayParsed.AddDate(0, 1, 0)
 
-	h.list(dayParsed, endDate, w, r)
+	h.list(dayParsed, endDate, w)
 }
 
 func (h *EventHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -170,5 +170,5 @@ func (h *EventHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func jsonError(w http.ResponseWriter, message string, code int) {
 	w.WriteHeader(code)
-	w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, message)))
+	fmt.Fprintf(w, `{"error": "%s"}`, message)
 }

@@ -7,7 +7,7 @@ import (
 
 type EventDateTime time.Time
 
-//type EventDateTime struct { time.Time }
+// type EventDateTime struct { time.Time }
 
 const dateTimeLayout = "2006-01-02 15:04"
 
@@ -45,7 +45,7 @@ var (
 	ErrUpdateEvent      = errors.New("can't update event")
 	ErrDates            = errors.New("end date < start date")
 	ErrList             = errors.New("can't select events")
-	ErrEmptyId          = errors.New("empty id")
+	ErrEmptyID          = errors.New("empty id")
 	ErrEmptyTitle       = errors.New("empty title")
 	ErrEmptyDescription = errors.New("empty description")
 	ErrEmptyStartDate   = errors.New("empty start date")
@@ -81,12 +81,15 @@ func (e *Event) Validate() error {
 	if e.Description == "" {
 		return ErrEmptyDescription
 	}
+	if e.StartDate.Compare(e.EndDate) > 0 {
+		return ErrDates
+	}
 	return nil
 }
 
 func (e *Event) ValidateUpdate() error {
 	if e.ID == 0 {
-		return ErrEmptyId
+		return ErrEmptyID
 	}
 	return e.Validate()
 }
@@ -106,9 +109,6 @@ func (e *EventModifyGrpc) ValidateCreateGrpcAndReturnParsedDates() (EventDateTim
 	endDateParsed, err := ParseToEventDateTime(e.EndDate)
 	if err != nil {
 		return defaultTime, defaultTime, ErrParseEndDate
-	}
-	if startDateParsed.Compare(endDateParsed) > 0 {
-		return defaultTime, defaultTime, ErrDates
 	}
 	return startDateParsed, endDateParsed, nil
 }

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/codes"  //nolint
+	"google.golang.org/grpc/status" //nolint
 
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/grpc/pb" //nolint
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage"        //nolint
@@ -26,10 +26,10 @@ type EventService struct {
 func (h *EventService) CreateEvent(_ context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
 	var id int32
 	event := storage.EventModifyGrpc{
-		Title: req.GetTitle(), 
-		Description: req.GetDescription(), 
-		StartDate: req.GetStartDate(), 
-		EndDate: req.GetEndDate(),
+		Title:       req.GetTitle(),
+		Description: req.GetDescription(),
+		StartDate:   req.GetStartDate(),
+		EndDate:     req.GetEndDate(),
 	}
 	startDateParsed, endDateParsed, err := event.ValidateCreateGrpcAndReturnParsedDates()
 	if err != nil {
@@ -58,11 +58,11 @@ func (h *EventService) DeleteEvent(_ context.Context, req *pb.DeleteEventRequest
 
 func (h *EventService) UpdateEvent(_ context.Context, req *pb.UpdateEventRequest) (*pb.UpdateEventResponse, error) {
 	event := storage.EventModifyGrpc{
-		ID: req.GetId(),
-		Title: req.GetTitle(), 
-		Description: req.GetDescription(), 
-		StartDate: req.GetStartDate(), 
-		EndDate: req.GetEndDate(),
+		ID:          req.GetId(),
+		Title:       req.GetTitle(),
+		Description: req.GetDescription(),
+		StartDate:   req.GetStartDate(),
+		EndDate:     req.GetEndDate(),
 	}
 	startDateParsed, endDateParsed, err := event.ValidateCreateGrpcAndReturnParsedDates()
 	if err != nil {

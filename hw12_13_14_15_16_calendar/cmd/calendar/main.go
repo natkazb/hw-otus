@@ -9,12 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/app"    //nolint
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/config" //nolint
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/logger" //nolint
-
-	//internalgrpc "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/grpc" //nolint
-
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/app"                      //nolint
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/config"                   //nolint
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/logger"                   //nolint
 	internalhttp "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/http" //nolint
 	sqlstorage "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage/sql"   //nolint
 )
@@ -50,8 +47,8 @@ func main() {
 		conf.Storage.SQL.Password)
 	calendar := app.New(logg, storage)
 
-	serverHttp := internalhttp.NewServer(conf.HTTP.Host, conf.HTTP.Port, logg, calendar)
-	//serverGrpc := internalgrpc.NewServer(conf.GRPC.Host, conf.GRPC.Port, logg, calendar)
+	serverHTTP := internalhttp.NewServer(conf.HTTP.Host, conf.HTTP.Port, logg, calendar)
+	// serverGrpc := internalgrpc.NewServer(conf.GRPC.Host, conf.GRPC.Port, logg, calendar)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -67,12 +64,12 @@ func main() {
 			logg.Error("failed to stop storage: " + err.Error())
 		}
 
-		if err := serverHttp.Stop(ctx); err != nil {
+		if err := serverHTTP.Stop(ctx); err != nil {
 			logg.Error("failed to stop http server: " + err.Error())
 		}
-		/*if err := serverGrpc.Stop(ctx); err != nil {
+		/* if err := serverGrpc.Stop(ctx); err != nil {
 			logg.Error("failed to stop grpc server: " + err.Error())
-		}*/
+		} */
 	}()
 
 	logg.Info("calendar is running...")
@@ -83,13 +80,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := serverHttp.Start(ctx); err != nil {
+	if err := serverHTTP.Start(ctx); err != nil {
 		logg.Error("failed to start http server: " + err.Error())
 		cancel()
 		os.Exit(1)
 	}
 
-	/*if err := serverGrpc.Start(ctx); err != nil {
+	/* if err := serverGrpc.Start(ctx); err != nil {
 		logg.Error("failed to start grpc server: " + err.Error())
 		cancel()
 		os.Exit(1)

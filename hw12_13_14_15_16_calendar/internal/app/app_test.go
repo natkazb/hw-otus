@@ -32,7 +32,14 @@ func TestApp(t *testing.T) {
 	l := &LoggerTest{}
 	appl := New(l, nil)
 	now := time.Now()
-	err := appl.UpdateEvent(nil, 1, "", "", now.Add(time.Hour), now.Add(-time.Hour)) //nolint
+	event := storage.Event{
+		ID:          1,
+		Title:       "Title",
+		Description: "Description",
+		StartDate:   storage.EventDateTime(now.Add(time.Hour)),
+		EndDate:     storage.EventDateTime(now.Add(-time.Hour)),
+	}
+	err := appl.UpdateEvent(event)
 	require.Error(t, err)
 	require.ErrorIs(t, err, storage.ErrDates)
 }
