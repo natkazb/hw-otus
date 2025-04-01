@@ -8,7 +8,7 @@ import (
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/server/grpc/pb" //nolint
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage"        //nolint
 	"github.com/pkg/errors"
-	"google.golang.org/grpc" //nolint
+	"google.golang.org/grpc"
 )
 
 type Logger interface {
