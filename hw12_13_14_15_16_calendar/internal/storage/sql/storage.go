@@ -36,8 +36,9 @@ func (s *Storage) Close(_ context.Context) error {
 	return s.db.Close()
 }
 
-func (s *Storage) CreateEvent(e storage.Event) error {
-	_, err := s.db.Exec(`INSERT INTO event 
+func (s *Storage) CreateEvent(e storage.EventDB) (int32, error) {
+	var id int32
+	err := s.db.QueryRow(`INSERT INTO event 
 	(title, start_date, end_date, description, user_id, notify_on) 
 	VALUES ($1, $2, $3, $4, $5, $6) 
 	RETURNING id`,
@@ -47,16 +48,19 @@ func (s *Storage) CreateEvent(e storage.Event) error {
 		e.Description,
 		1, // эти поля пока не реализуем
 		1,
-	)
-	return err
+	).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }
 
-func (s *Storage) DeleteEvent(id int) error {
+func (s *Storage) DeleteEvent(id int32) error {
 	_, err := s.db.Exec("DELETE FROM event WHERE id = $1", id)
 	return err
 }
 
-func (s *Storage) UpdateEvent(e storage.Event) error {
+func (s *Storage) UpdateEvent(e storage.EventDB) error {
 	_, err := s.db.Exec(`UPDATE event SET 
 	title = $2, 
 	start_date = $3, 
@@ -77,7 +81,7 @@ func (s *Storage) ListEvents(startData, endData time.Time) ([]storage.Event, err
 	err := s.db.Select(&events, `
 SELECT id, title, start_date, end_date, description
 FROM event
-WHERE start_date >= $1 AND start_date <= $2`,
+WHERE start_date >= $1 AND start_date < $2`,
 		startData, endData)
 	return events, err
 }

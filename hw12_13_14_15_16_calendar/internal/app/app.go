@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -21,9 +20,9 @@ type Logger interface {
 }
 
 type Storage interface {
-	CreateEvent(e storage.Event) error
-	UpdateEvent(e storage.Event) error
-	DeleteEvent(id int) error
+	CreateEvent(e storage.EventDB) (int32, error)
+	UpdateEvent(e storage.EventDB) error
+	DeleteEvent(id int32) error
 	ListEvents(startData, endData time.Time) ([]storage.Event, error)
 }
 
@@ -34,22 +33,20 @@ func New(logger Logger, storage Storage) *App {
 	}
 }
 
-func (a *App) CreateEvent(_ context.Context, title string) error {
-	now := time.Now()
-	newEvent := storage.Event{Title: title, StartDate: now, EndDate: now.Add(time.Hour * 3), Description: "testing"}
-	err := newEvent.Validate()
+func (a *App) CreateEvent(event storage.Event) (int32, error) {
+	err := event.Validate()
 	if err != nil {
 		a.log.Error(err.Error())
-		return err
+		return 0, err
 	}
-	err = a.storage.CreateEvent(newEvent)
+	id, err := a.storage.CreateEvent(event.CopyToEventDB())
 	if err != nil {
 		a.log.Error(fmt.Errorf("%w: %w", storage.ErrCreateEvent, err).Error())
 	}
-	return err
+	return id, err
 }
 
-func (a *App) DeleteEvent(_ context.Context, id int) error {
+func (a *App) DeleteEvent(id int32) error {
 	err := a.storage.DeleteEvent(id)
 	if err != nil {
 		a.log.Error(fmt.Errorf("%w id=%d: %w", storage.ErrDeleteEvent, id, err).Error())
@@ -57,21 +54,21 @@ func (a *App) DeleteEvent(_ context.Context, id int) error {
 	return err
 }
 
-func (a *App) UpdateEvent(_ context.Context, id int, title, description string, startDate, endDate time.Time) error {
-	newEvent := storage.Event{ID: id, Title: title, StartDate: startDate, EndDate: endDate, Description: description}
-	err := newEvent.Validate()
+func (a *App) UpdateEvent(event storage.Event) error {
+	err := event.ValidateUpdate()
 	if err != nil {
 		a.log.Error(err.Error())
 		return err
 	}
-	err = a.storage.UpdateEvent(newEvent)
+	err = a.storage.UpdateEvent(event.CopyToEventDB())
 	if err != nil {
-		a.log.Error(fmt.Errorf("%w id=%d: %w", storage.ErrUpdateEvent, id, err).Error())
+		a.log.Error(fmt.Errorf("%w id=%d: %w", storage.ErrUpdateEvent, event.ID, err).Error())
 	}
 	return err
 }
 
 func (a *App) ListEvents(startData, endData time.Time) ([]storage.Event, error) {
+	a.log.Info(fmt.Sprintf("get ListEvents from %v to %v", startData, endData))
 	list, err := a.storage.ListEvents(startData, endData)
 	if err != nil {
 		a.log.Error(fmt.Errorf("%w %v %v: %w", storage.ErrList, startData, endData, err).Error())
