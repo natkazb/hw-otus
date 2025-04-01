@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "f8847624-d139-474a-b4d6-ef38e8848fbd",
+		"name": "otus_go",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2350868"
+	},
+	"item": [
+		{
+			"name": "list-day",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8083/events/list-day?day=2025-03-26",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"events",
+						"list-day"
+					],
+					"query": [
+						{
+							"key": "day",
+							"value": "2025-03-26"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list-week",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8083/events/list-week?day=2025-03-18",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"events",
+						"list-week"
+					],
+					"query": [
+						{
+							"key": "day",
+							"value": "2025-03-18"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list-month",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8083/events/list-month?day=2025-03-18",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"events",
+						"list-month"
+					],
+					"query": [
+						{
+							"key": "day",
+							"value": "2025-03-18"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Событие\",\n    \"description\": \"Описание\",\n    \"startDate\": \"2025-04-26 10:15\",\n    \"endDate\": \"2025-03-27 18:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/event/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"event",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 33,\n    \"title\": \"Событие555\",\n    \"description\": \"Описание555\",\n    \"startDate\": \"2025-04-26 10:15\",\n    \"endDate\": \"2025-03-27 18:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/event/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"event",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 33\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/event/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"event",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
