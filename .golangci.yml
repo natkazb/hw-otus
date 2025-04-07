@@ -20,6 +20,9 @@ linters-settings:
           - github.com/lib/pq
           - github.com/pkg/errors
           - gopkg.in/yaml.v3
+          - google.golang.org/grpc
+          - google.golang.org/grpc/codes
+          - google.golang.org/grpc/metadata
       Test:
         files:
           - $test

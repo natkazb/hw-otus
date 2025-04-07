@@ -12,5 +12,9 @@ storage:
     driver: "postgres"
 http:
   host: "localhost"
-  port: "8080"
+  port: "8083"
+  timeout: "30s"
+grpc:
+  host: ""
+  port: "50051"
   timeout: "30s"

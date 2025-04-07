@@ -29,7 +29,7 @@ test:
 	go test -race ./internal/...
 
 install-lint-deps:
-	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.64.8
+	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.63.4
 
 lint: install-lint-deps
 	golangci-lint run ./...
@@ -53,3 +53,12 @@ migration-status:
 
 migration-reset:
 	goose -dir $(MIGRATION_DIR) postgres $(DB_STRING) reset
+
+generate:
+	rm -rf ./internal/server/grpc/pb
+	mkdir -p ./internal/server/grpc/pb
+
+	protoc \
+		--go_out=./internal/server/grpc \
+		--go-grpc_out=./internal/server/grpc \
+		./api/*.proto
