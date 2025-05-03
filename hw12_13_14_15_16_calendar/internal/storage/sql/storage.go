@@ -14,6 +14,7 @@ type Storage struct {
 	Dsn    string
 	Driver string
 	db     *sqlx.DB
+	ctx    context.Context
 }
 
 func New(driver, host string, port int, dbName, user, pass string) *Storage {
@@ -24,9 +25,17 @@ func New(driver, host string, port int, dbName, user, pass string) *Storage {
 	}
 }
 
-func (s *Storage) Connect(_ context.Context) (err error) {
+func (s *Storage) Connect(ctx context.Context) (err error) {
 	s.db, err = sqlx.Connect(s.Driver, s.Dsn)
-	return
+	if err != nil {
+		return err
+	}
+	err = s.db.PingContext(ctx)
+	if err != nil {
+		return err
+	}
+	s.ctx = ctx
+	return nil
 }
 
 func (s *Storage) Close(_ context.Context) error {
@@ -84,4 +93,8 @@ FROM event
 WHERE start_date >= $1 AND start_date < $2`,
 		startData, endData)
 	return events, err
+}
+
+func (s *Storage) GetForSh() ([]storage.Event, error) {
+	return make([]storage.Event, 0), nil
 }

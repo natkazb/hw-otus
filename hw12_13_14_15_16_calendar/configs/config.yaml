@@ -18,3 +18,10 @@ grpc:
   host: ""
   port: "50051"
   timeout: "30s"
+rabbit:
+  host: "localhost"
+  port: 5672
+  user: ""
+  password: ""  
+  queueName: "Notifications"
+  timeout: "30s"

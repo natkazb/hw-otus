@@ -23,6 +23,7 @@ linters-settings:
           - google.golang.org/grpc
           - google.golang.org/grpc/codes
           - google.golang.org/grpc/metadata
+          - github.com/rabbitmq/amqp091-go
       Test:
         files:
           - $test

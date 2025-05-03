@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -15,6 +16,7 @@ type Config struct {
 	HTTP    HTTPConf   `yaml:"http"`
 	GRPC    GRPCConf   `yaml:"grpc"`
 	Storage Storage    `yaml:"storage"`
+	Rabbit  RabbitConf `yaml:"rabbit"`
 }
 
 type LoggerConf struct {
@@ -46,6 +48,15 @@ type SQLConf struct {
 	Username string `yaml:"user"`
 	Password string `yaml:"password"`
 	Driver   string `yaml:"driver"`
+}
+
+type RabbitConf struct {
+	Host      string        `yaml:"host"`
+	Port      int           `yaml:"port"`
+	User      string        `yaml:"user"`
+	Password  string        `yaml:"password"`
+	QueueName string        `yaml:"queueName"`
+	Timeout   time.Duration `yaml:"timeout"`
 }
 
 func NewConfig(filePath string) (Config, error) {
