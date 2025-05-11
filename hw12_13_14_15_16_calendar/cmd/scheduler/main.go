@@ -47,7 +47,7 @@ func main() {
 		conf.Rabbit.QueueName,
 		conf.Rabbit.Timeout)
 
-	sch := scheduler.New(conf.Rabbit.Timeout, q, storage, logg)
+	sch := scheduler.New(conf.Rabbit.Timeout, conf.MonthsOld, q, storage, logg)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)

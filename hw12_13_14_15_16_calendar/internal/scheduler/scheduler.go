@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/app"   //nolint
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/queue" //nolint
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/app"     //nolint
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/queue"   //nolint
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage" //nolint
 )
 
@@ -17,19 +17,21 @@ type Storage interface {
 }
 
 type Scheduler struct {
-	period  time.Duration
-	q       *queue.RabbitMq
-	storage Storage
-	logger  app.Logger
-	ctx     context.Context
+	period    time.Duration
+	monthsOld int
+	q         *queue.RabbitMq
+	storage   Storage
+	logger    app.Logger
+	ctx       context.Context
 }
 
-func New(period time.Duration, q *queue.RabbitMq, storage Storage, logger app.Logger) Scheduler {
+func New(period time.Duration, monthsOld int, q *queue.RabbitMq, storage Storage, logger app.Logger) Scheduler {
 	return Scheduler{
-		period:  period,
-		q:       q,
-		storage: storage,
-		logger:  logger,
+		period:    period,
+		monthsOld: monthsOld,
+		q:         q,
+		storage:   storage,
+		logger:    logger,
 	}
 }
 

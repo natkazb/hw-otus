@@ -13,6 +13,13 @@ type Sender struct {
 	logger app.Logger
 }
 
+func New(q *queue.RabbitMq, logger app.Logger) Sender {
+	return Sender{
+		q:      q,
+		logger: logger,
+	}
+}
+
 func (s *Sender) Run() {
 	ch, err := s.q.Consume()
 	if err != nil {
@@ -37,11 +44,4 @@ func (s *Sender) Start(ctx context.Context) error {
 
 func (s *Sender) Stop(ctx context.Context) error {
 	return s.q.Stop(ctx)
-}
-
-func New(q *queue.RabbitMq, logger app.Logger) Sender {
-	return Sender{
-		q:      q,
-		logger: logger,
-	}
 }

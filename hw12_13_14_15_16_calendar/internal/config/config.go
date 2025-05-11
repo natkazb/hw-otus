@@ -12,11 +12,12 @@ import (
 // Организация конфига в main принуждает нас сужать API компонентов, использовать
 // при их конструировании только необходимые параметры, а также уменьшает вероятность циклической зависимости.
 type Config struct {
-	Logger  LoggerConf `yaml:"logger"`
-	HTTP    HTTPConf   `yaml:"http"`
-	GRPC    GRPCConf   `yaml:"grpc"`
-	Storage Storage    `yaml:"storage"`
-	Rabbit  RabbitConf `yaml:"rabbit"`
+	Logger    LoggerConf `yaml:"logger"`
+	HTTP      HTTPConf   `yaml:"http"`
+	GRPC      GRPCConf   `yaml:"grpc"`
+	Storage   Storage    `yaml:"storage"`
+	Rabbit    RabbitConf `yaml:"rabbit"`
+	MonthsOld int        `yaml:"monthsOld"`
 }
 
 type LoggerConf struct {
