@@ -1,0 +1,10 @@
+logger:
+  level: "INFO"
+  fileName: "/tmp/sender.log"
+rabbit:
+  host: "localhost"
+  port: 5672
+  user: "guest"
+  password: "guest"  
+  queueName: "events"
+  timeout: "5s"

@@ -1,6 +1,6 @@
 logger:
   level: "INFO"
-  fileName: "/tmp/calendar.log"
+  fileName: "/tmp/sheduler.log"
 storage:
   type: "sql"
   sql:
@@ -10,11 +10,10 @@ storage:
     password: "pass_cld"
     dbName: "calendar"
     driver: "postgres"
-http:
+rabbit:
   host: "localhost"
-  port: "8083"
-  timeout: "30s"
-grpc:
-  host: ""
-  port: "50051"
-  timeout: "30s"
+  port: 5672
+  user: "guest"
+  password: "guest"  
+  queueName: "events"
+  timeout: "5s"

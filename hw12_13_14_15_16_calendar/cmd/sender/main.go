@@ -12,14 +12,13 @@ import (
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/config"                 //nolint
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/logger"                 //nolint
 	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/queue"                  //nolint
-	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/scheduler"              //nolint
-	sqlstorage "github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/storage/sql" //nolint
+	"github.com/natkazb/hw-otus/hw12_13_14_15_16_calendar/internal/sender"              //nolint
 )
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config_sheduler.yaml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "/etc/calendar/config_sender.yaml", "Path to configuration file")
 }
 
 func main() {
@@ -33,13 +32,6 @@ func main() {
 
 	logg := logger.New(conf.Logger.Level)
 
-	storage := sqlstorage.New(conf.Storage.SQL.Driver,
-		conf.Storage.SQL.Host,
-		conf.Storage.SQL.Port,
-		conf.Storage.SQL.DBName,
-		conf.Storage.SQL.Username,
-		conf.Storage.SQL.Password)
-
 	q := queue.New(conf.Rabbit.Host,
 		conf.Rabbit.Port,
 		conf.Rabbit.User,
@@ -47,7 +39,7 @@ func main() {
 		conf.Rabbit.QueueName,
 		conf.Rabbit.Timeout)
 
-	sch := scheduler.New(conf.Rabbit.Timeout, q, storage, logg)
+	send := sender.New(q, logg)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -59,18 +51,18 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 		defer cancel()
 
-		if err := sch.Stop(ctx); err != nil {
-			logg.Error("failed to stop scheduler: " + err.Error())
+		if err := send.Stop(ctx); err != nil {
+			logg.Error("failed to stop sender: " + err.Error())
 		}
 	}()
 
-	err = sch.Start(ctx)
+	err = send.Start(ctx)
 	if err != nil {
 		logg.Error(err.Error())
 		cancel()
 		os.Exit(1)
 	}
 
-	logg.Info("scheduler is running...")
-	sch.Run()
+	logg.Info("sender is running...")
+	send.Run()
 }
