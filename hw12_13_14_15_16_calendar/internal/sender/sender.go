@@ -29,7 +29,7 @@ func (s *Sender) Run() {
 	for {
 		select {
 		case msg := <-ch:
-			s.logger.Info("received event" + string(msg.Body))
+			s.logger.Info(" SEND " + string(msg.Body))
 		case <-s.ctx.Done():
 			return
 		}

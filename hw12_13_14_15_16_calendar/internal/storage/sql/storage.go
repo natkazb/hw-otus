@@ -95,6 +95,12 @@ WHERE start_date >= $1 AND start_date < $2`,
 	return events, err
 }
 
-func (s *Storage) GetForSh() ([]storage.Event, error) {
-	return make([]storage.Event, 0), nil
+func (s *Storage) Notify() ([]storage.Event, error) {
+	events := make([]storage.Event, 0)
+	err := s.db.Select(&events, `
+SELECT id, title, start_date, end_date, description
+FROM event
+WHERE (start_date - make_interval(days => notify_on)) <= $1`,
+		time.Now())
+	return events, err
 }

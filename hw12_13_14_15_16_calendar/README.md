@@ -28,5 +28,20 @@
 ```
 4) запустить scheduler
 `go run ./cmd/scheduler --config=./configs/config_scheduler.yaml`
+Если всё успешно, то будет такой вывод:
+```
+[INFO] 2025-05-11 13:49:27 scheduler is running...
+```
 4) запустить sender
 `go run ./cmd/sender --config=./configs/config_sender.yaml`
+Если всё успешно, то будет такой вывод:
+```
+[INFO] 2025-05-11 13:50:48 sender is running...
+```
+Если в хранилище будут подходящие данные, то будет такой вывод:
+```
+[INFO] 2025-05-11 13:50:48  SEND {"ID":2,"title":"test title","startDate":{},"endDate":{},"description":"testing"}
+[INFO] 2025-05-11 13:50:48  SEND {"ID":4,"title":"test title","startDate":{},"endDate":{},"description":"testing"}
+[INFO] 2025-05-11 13:50:48  SEND {"ID":6,"title":"test title","startDate":{},"endDate":{},"description":"testing"}
+[INFO] 2025-05-11 13:50:48  SEND {"ID":7,"title":"test title","startDate":{},"endDate":{},"description":"testing"}
+```

@@ -11,9 +11,9 @@ import (
 )
 
 type Storage interface {
-	GetForSh() ([]storage.Event, error)
 	Connect(ctx context.Context) error
 	Close(ctx context.Context) error
+	Notify() ([]storage.Event, error)
 }
 
 type Scheduler struct {
@@ -40,23 +40,20 @@ func (s *Scheduler) Run() {
 	for {
 		select {
 		case <-ticker.C:
-			events := s.getEvents()
-			s.Push(events)
+			s.logger.Info("start scheduler send to rabbitmq")
+			events, err := s.storage.Notify()
+			if err != nil {
+				s.logger.Error(err.Error())
+			} else {
+				s.Push(events)
+			}
+			s.logger.Info("end scheduler send to rabbitmq")
+			//@todo: удалить из бд старше s.monthsOld
 		case <-s.ctx.Done():
 			s.logger.Info("scheduler is stopping")
 			return
 		}
 	}
-}
-
-func (s *Scheduler) getEvents() []storage.Event {
-	events, err := s.storage.GetForSh()
-	if err != nil {
-		s.logger.Error(err.Error())
-		return make([]storage.Event, 0)
-	}
-
-	return events
 }
 
 func (s *Scheduler) Push(events []storage.Event) {

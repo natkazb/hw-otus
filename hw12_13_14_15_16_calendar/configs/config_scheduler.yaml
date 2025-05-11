@@ -16,5 +16,5 @@ rabbit:
   user: "guest"
   password: "guest"  
   queueName: "events"
-  timeout: 10
+  timeout: "3s"
 monthsOld: 4  
