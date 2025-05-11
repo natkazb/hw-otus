@@ -48,7 +48,7 @@ func (s *Scheduler) Run() {
 				s.Push(events)
 			}
 			s.logger.Info("end scheduler send to rabbitmq")
-			//@todo: удалить из бд старше s.monthsOld
+			// @todo: удалить из бд старше s.monthsOld
 		case <-s.ctx.Done():
 			s.logger.Info("scheduler is stopping")
 			return
