@@ -14,6 +14,7 @@ type Storage interface {
 	Connect(ctx context.Context) error
 	Close(ctx context.Context) error
 	Notify() ([]storage.Event, error)
+	Clear(months int) error
 }
 
 type Scheduler struct {
@@ -48,7 +49,12 @@ func (s *Scheduler) Run() {
 				s.Push(events)
 			}
 			s.logger.Info("end scheduler send to rabbitmq")
-			// @todo: удалить из бд старше s.monthsOld
+			s.logger.Info("start scheduler clear in DB")
+			err = s.storage.Clear(s.monthsOld)
+			if err != nil {
+				s.logger.Error(err.Error())
+			}
+			s.logger.Info("end scheduler clear in DB")
 		case <-s.ctx.Done():
 			s.logger.Info("scheduler is stopping")
 			return

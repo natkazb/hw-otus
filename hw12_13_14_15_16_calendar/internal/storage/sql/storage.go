@@ -104,3 +104,8 @@ WHERE (start_date - make_interval(days => notify_on)) <= $1`,
 		time.Now())
 	return events, err
 }
+
+func (s *Storage) Clear(months int) error {
+	_, err := s.db.Exec("DELETE FROM event WHERE (start_date + make_interval(months => $1)) <= $2", months, time.Now())
+	return err
+}
