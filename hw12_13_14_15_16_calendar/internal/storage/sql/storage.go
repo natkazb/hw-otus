@@ -14,6 +14,7 @@ type Storage struct {
 	Dsn    string
 	Driver string
 	db     *sqlx.DB
+	ctx    context.Context
 }
 
 func New(driver, host string, port int, dbName, user, pass string) *Storage {
@@ -24,9 +25,17 @@ func New(driver, host string, port int, dbName, user, pass string) *Storage {
 	}
 }
 
-func (s *Storage) Connect(_ context.Context) (err error) {
+func (s *Storage) Connect(ctx context.Context) (err error) {
 	s.db, err = sqlx.Connect(s.Driver, s.Dsn)
-	return
+	if err != nil {
+		return err
+	}
+	err = s.db.PingContext(ctx)
+	if err != nil {
+		return err
+	}
+	s.ctx = ctx
+	return nil
 }
 
 func (s *Storage) Close(_ context.Context) error {
@@ -84,4 +93,19 @@ FROM event
 WHERE start_date >= $1 AND start_date < $2`,
 		startData, endData)
 	return events, err
+}
+
+func (s *Storage) Notify() ([]storage.Event, error) {
+	events := make([]storage.Event, 0)
+	err := s.db.Select(&events, `
+SELECT id, title, start_date, end_date, description
+FROM event
+WHERE (start_date - make_interval(days => notify_on)) <= $1`,
+		time.Now())
+	return events, err
+}
+
+func (s *Storage) Clear(months int) error {
+	_, err := s.db.Exec("DELETE FROM event WHERE (start_date + make_interval(months => $1)) <= $2", months, time.Now())
+	return err
 }
