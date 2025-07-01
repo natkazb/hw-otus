@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -11,10 +12,12 @@ import (
 // Организация конфига в main принуждает нас сужать API компонентов, использовать
 // при их конструировании только необходимые параметры, а также уменьшает вероятность циклической зависимости.
 type Config struct {
-	Logger  LoggerConf `yaml:"logger"`
-	HTTP    HTTPConf   `yaml:"http"`
-	GRPC    GRPCConf   `yaml:"grpc"`
-	Storage Storage    `yaml:"storage"`
+	Logger    LoggerConf `yaml:"logger"`
+	HTTP      HTTPConf   `yaml:"http"`
+	GRPC      GRPCConf   `yaml:"grpc"`
+	Storage   Storage    `yaml:"storage"`
+	Rabbit    RabbitConf `yaml:"rabbit"`
+	MonthsOld int        `yaml:"monthsOld"`
 }
 
 type LoggerConf struct {
@@ -46,6 +49,15 @@ type SQLConf struct {
 	Username string `yaml:"user"`
 	Password string `yaml:"password"`
 	Driver   string `yaml:"driver"`
+}
+
+type RabbitConf struct {
+	Host      string        `yaml:"host"`
+	Port      int           `yaml:"port"`
+	User      string        `yaml:"user"`
+	Password  string        `yaml:"password"`
+	QueueName string        `yaml:"queueName"`
+	Timeout   time.Duration `yaml:"timeout"`
 }
 
 func NewConfig(filePath string) (Config, error) {

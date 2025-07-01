@@ -1,0 +1,20 @@
+logger:
+  level: "INFO"
+  fileName: "/tmp/sheduler.log"
+storage:
+  type: "sql"
+  sql:
+    host: "localhost"
+    port: 5432
+    user: "user_cld"
+    password: "pass_cld"
+    dbName: "calendar"
+    driver: "postgres"
+rabbit:
+  host: "localhost"
+  port: 5672
+  user: "guest"
+  password: "guest"  
+  queueName: "events"
+  timeout: "3s"
+monthsOld: 4

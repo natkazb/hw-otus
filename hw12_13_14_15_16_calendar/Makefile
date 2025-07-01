@@ -2,6 +2,8 @@ MIGRATION_DIR=migrations
 DB_STRING="postgres://user_cld:pass_cld@localhost:5432/calendar?sslmode=disable"
 
 BIN := "./bin/calendar"
+BIN_SENDER := "./bin/sender"
+BIN_SCHEDULER := "./bin/scheduler"
 DOCKER_IMG="calendar:develop"
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
@@ -9,9 +11,13 @@ LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%d
 
 build:
 	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
+	go build -v -o $(BIN_SENDER) ./cmd/sender
+	go build -v -o $(BIN_SCHEDULER) ./cmd/scheduler
 
 run: build
 	$(BIN) -config ./configs/config.yaml
+	$(BIN_SENDER) -config ./configs/config_sender.yaml
+	$(BIN_SCHEDULER) -config ./configs/config_scheduler.yaml
 
 build-img:
 	docker build \
